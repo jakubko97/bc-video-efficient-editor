@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -27,7 +26,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
+
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.MergingMediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
@@ -36,8 +52,8 @@ import java.io.File;
 public class TrimActivity extends AppCompatActivity {
 
     Uri uri;
-    private VideoView vv;
     private ImageView imageView;
+    SimpleExoPlayer player;
     private TextView textViewLeft, textViewRight;
     private boolean isPlaying;
     private Handler myHandler = new Handler();
@@ -55,7 +71,7 @@ public class TrimActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trim);
 
-        vv = (VideoView) findViewById(R.id.videoView);
+        //vv = (VideoView) findViewById(R.id.videoView);
         imageView = (ImageView) findViewById(R.id.imageView);
         textViewLeft = (TextView) findViewById(R.id.tvvLeft);
         textViewRight = (TextView) findViewById(R.id.tvvRight);
@@ -66,43 +82,9 @@ public class TrimActivity extends AppCompatActivity {
         if(i!=null){
             String imgPath = i.getStringExtra("uri");
             uri = Uri.parse(imgPath);
-            vv.setVideoURI(uri);
-            vv.start();
+
             isPlaying = true;
         }
-
-        setListeners();
-
-
-        vv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            // Close the progress bar and play the video
-            public void onPrepared(MediaPlayer mp) {
-                vv.start();
-
-                duration = vv.getDuration();
-
-                textViewLeft.setText(getTime(vv.getCurrentPosition()));
-                textViewRight.setText(getTime(vv.getDuration()));
-
-                rangeSeekBar.setRangeValues(0,vv.getDuration());
-                rangeSeekBar.setSelectedMaxValue(vv.getDuration());
-                rangeSeekBar.setSelectedMinValue(0);
-                rangeSeekBar.setEnabled(true);
-
-                rangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
-                    @Override
-                    public void onRangeSeekBarValuesChanged(RangeSeekBar bar, Object minValue, Object maxValue) {
-                        vv.seekTo((int)minValue);
-
-
-                        textViewLeft.setText(getTime((int)bar.getSelectedMinValue()));
-                        textViewRight.setText(getTime((int)bar.getSelectedMaxValue()));
-                    }
-                });
-
-                myHandler.postDelayed(UpdateSongTime,100);
-            }
-        });
 
     }
 
@@ -118,28 +100,28 @@ public class TrimActivity extends AppCompatActivity {
 
     }
 
-    private void setListeners() {
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(isPlaying){
-                    imageView.setImageResource(R.drawable.ic_play_foreground);
-                    vv.pause();
-                    isPlaying = false;
-                }else {
-                    vv.start();
-                    imageView.setImageResource(R.drawable.ic_pause);
-                    isPlaying = true;
-                    //myHandler.postDelayed(UpdateImageView,1500);
-                }
-
-            }
-        });
-    }
+//    private void setListeners() {
+//        imageView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(isPlaying){
+//                    imageView.setImageResource(R.drawable.ic_play_foreground);
+//                    player.pause();
+//                    isPlaying = false;
+//                }else {
+//                    player.start();
+//                    imageView.setImageResource(R.drawable.ic_pause);
+//                    isPlaying = true;
+//                    //myHandler.postDelayed(UpdateImageView,1500);
+//                }
+//
+//            }
+//        });
+//    }
 
     private Runnable UpdateSongTime = new Runnable() {
         public void run() {
-            textViewLeft.setText(getTime(vv.getCurrentPosition()));
+            textViewLeft.setText(getTime((int)player.getCurrentPosition()));
 
             myHandler.postDelayed(this, 100);
         }
@@ -157,7 +139,6 @@ public class TrimActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.trim){
 
-            vv.pause();
 
             final AlertDialog.Builder alert = new AlertDialog.Builder(TrimActivity.this);
 
@@ -256,6 +237,81 @@ public class TrimActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu,menu);
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initializePlayer();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (player!=null) {
+            player.release();
+            player = null;
+        }
+    }
+
+    private void initializePlayer(){
+        // Create a default TrackSelector
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector =
+                new DefaultTrackSelector(videoTrackSelectionFactory);
+
+        //Initialize the player
+        player = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+
+
+        //Initialize simpleExoPlayerView
+        SimpleExoPlayerView simpleExoPlayerView = findViewById(R.id.exoplayer);
+        simpleExoPlayerView.setPlayer(player);
+
+        // Produces DataSource instances through which media data is loaded.
+        DataSource.Factory dataSourceFactory =
+                new DefaultDataSourceFactory(this, Util.getUserAgent(this, "CloudinaryExoplayer"));
+
+        // Produces Extractor instances for parsing the media data.
+        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+
+        // This is the MediaSource representing the media to be played.
+
+        MediaSource videoSource = new ExtractorMediaSource(uri,
+                dataSourceFactory, extractorsFactory, null, null);
+
+
+        duration = (int)player.getDuration();
+        Log.d("jakubko","duration: "+ duration + "long :" + player.getDuration());
+
+        textViewLeft.setText(getTime((int)player.getCurrentPosition()));
+        textViewRight.setText(getTime(duration));
+
+        rangeSeekBar.setRangeValues(0,(int)player.getDuration());
+        rangeSeekBar.setSelectedMaxValue((int)player.getDuration());
+        rangeSeekBar.setSelectedMinValue(0);
+        rangeSeekBar.setEnabled(true);
+
+        rangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
+            @Override
+            public void onRangeSeekBarValuesChanged(RangeSeekBar bar, Object minValue, Object maxValue) {
+                //player.seekTo((long)minValue);
+
+                textViewLeft.setText(getTime((int)bar.getSelectedMinValue()));
+                textViewRight.setText(getTime((int)bar.getSelectedMaxValue()));
+
+                Toast.makeText(getApplicationContext(),"min value: "+(int)minValue + "\nmax value: "+ (int)maxValue,Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+        myHandler.postDelayed(UpdateSongTime,100);
+
+        // Prepare the player with the source.
+        player.prepare(videoSource);
+
     }
 }
 

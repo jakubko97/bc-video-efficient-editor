@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -11,8 +12,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static int VIDEO_REQUEST = 101;
     Uri selectedUri;
-    private Button openVideo;
+    private Button openVideo, captureVideo;
+    MediaPlayer audio;
+    int audioDuration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +24,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         openVideo = (Button) findViewById(R.id.openVideo);
+        captureVideo = (Button) findViewById(R.id.captureVideo);
+
+        audio = MediaPlayer.create(this, R.raw.audios);
+        audioDuration = audio.getDuration()/1000;
 
         openVideo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -27,6 +35,25 @@ public class MainActivity extends AppCompatActivity {
                 openVideo(v);
             }
         });
+
+        captureVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                captureVideo(v);
+            }
+        });
+    }
+
+    public void captureVideo(View v){
+
+        Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        videoIntent.putExtra("android.intent.extra.durationLimit", audioDuration);
+
+        if(videoIntent.resolveActivity(getPackageManager()) != null){
+
+            startActivityForResult(videoIntent,VIDEO_REQUEST);
+
+        }
     }
 
     public void openVideo(View v){
@@ -48,6 +75,16 @@ public class MainActivity extends AppCompatActivity {
             Intent i = new Intent(MainActivity.this,VideoActivity.class);
             i.putExtra("uri",selectedUri.toString());
             startActivity(i);
+        }
+
+        if(requestCode==VIDEO_REQUEST && resultCode==RESULT_OK){
+
+            selectedUri = data.getData();
+
+            Intent i = new Intent(MainActivity.this,VideoActivity.class);
+            i.putExtra("uri",selectedUri.toString());
+            startActivity(i);
+
         }
     }
 }

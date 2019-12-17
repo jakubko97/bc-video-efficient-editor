@@ -10,11 +10,22 @@
         android:id="@+id/openVideo"
         android:layout_width="0dp"
         android:layout_height="111dp"
-        android:layout_marginTop="292dp"
-        android:text="Open a video"
+        android:layout_marginTop="412dp"
+        android:text="Open video"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/captureVideo"
+        android:layout_width="0dp"
+        android:layout_height="111dp"
+        android:layout_marginTop="264dp"
+        android:text="Capture video"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

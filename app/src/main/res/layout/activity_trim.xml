@@ -2,14 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorBlack">
 
-    <VideoView
-        android:id="@+id/videoView"
+    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+        android:id="@+id/exoplayer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true" />
+        android:layout_height="wrap_content"/>
 
     <ImageView
         android:id="@+id/imageView"
@@ -20,8 +19,8 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="180dp"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="0dp"
         android:background="@color/colorAccent">
@@ -29,15 +28,15 @@
 
         <org.florescu.android.rangeseekbar.RangeSeekBar
             android:id="@+id/rangeSeekBar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginRight="17dp"
-            android:layout_marginLeft="17dp"
             rsb_indicator_text_color="#fff"
             rsb_progress_color="@color/colorPrimaryDark"
             rsb_progress_default_color="@color/colorPrimaryDark"
             rsb_tick_mark_text_color="@color/colorPrimaryDark"
-            android:layout_centerInParent="true" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="17dp"
+            android:layout_marginRight="17dp" />
 
         <TextView
             android:id="@+id/tvvLeft"
@@ -56,8 +55,8 @@
             android:layout_alignParentRight="true"
             android:layout_marginTop="10dp"
             android:layout_marginRight="15dp"
-            android:text="00:00:000"
             android:gravity="end"
+            android:text="00:00:000"
             android:textSize="16dp"></TextView>
 
     </RelativeLayout>

@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -30,4 +34,8 @@ dependencies {
     implementation 'org.florescu.android.rangeseekbar:rangeseekbar-library:0.3.0'
     implementation 'com.mikhaellopez:circularprogressbar:3.0.3'
     implementation 'com.writingminds:FFmpegAndroid:0.3.2'
+    implementation 'com.google.android.exoplayer:exoplayer:2.10.7'
+    implementation "android.arch.work:work-runtime:1.0.0"
+
+
 }

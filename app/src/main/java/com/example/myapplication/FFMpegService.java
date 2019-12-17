@@ -2,14 +2,20 @@ package com.example.myapplication;
 
 import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
+import androidx.work.Data;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 
 import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
@@ -19,42 +25,52 @@ import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunnin
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 
 
-public class FFMpegService extends Service {
+public class FFMpegService extends Worker {
 
     FFmpeg ffmpeg;
     int duration;
 
     String[] command;
-    Callbacks activity;
 
-
+    Data output;
 
     public MutableLiveData<Integer> percentage;
-    IBinder myBinder = new LocalBinder();
 
-    @Override
-    public void onStart(Intent intent, int startId) {
-        super.onStart(intent, startId);
+    public FFMpegService(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
     }
 
+    @NonNull
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public Result doWork() {
 
-        if(intent!=null){
+        duration = getInputData().getInt("duration",duration);
+        command = getInputData().getStringArray("command");
 
-            duration = Integer.parseInt(intent.getStringExtra("duration"));
-            command = intent.getStringArrayExtra("command");
-            try {
-                loadFFmpegBinary();
-                execFFmpegCommand();
-            } catch (FFmpegNotSupportedException e) {
-                e.printStackTrace();
-            } catch (FFmpegCommandAlreadyRunningException e) {
-                e.printStackTrace();
-            }
+        percentage = new MutableLiveData<>();
+
+        try {
+            loadFFmpegBinary();
+            execFFmpegCommand();
+
+            output = new Data.Builder()
+                    .putInt("percentage", percentage.getValue())
+                    .build();
+
+            Result.success(output);
+
+        } catch (FFmpegNotSupportedException e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Mp3 conversion is not supported by that device", Toast.LENGTH_LONG).show();
+
+            Result.failure();
+        } catch (FFmpegCommandAlreadyRunningException e) {
+            e.printStackTrace();
+
+            Result.failure();
         }
 
-        return super.onStartCommand(intent, flags, startId);
+        return Result.success(output);
     }
 
     private void execFFmpegCommand() throws FFmpegCommandAlreadyRunningException {
@@ -64,16 +80,19 @@ public class FFMpegService extends Service {
             @Override
             public void onFailure(String message) {
                 super.onFailure(message);
+                Log.w(null,message);
             }
 
             @Override
             public void onSuccess(String message) {
                 super.onSuccess(message);
+
             }
 
             @Override
             public void onProgress(String message) {
-                 String arr[];
+
+                String arr[];
 
                 if(message.contains("time=")){
 
@@ -90,43 +109,34 @@ public class FFMpegService extends Service {
                     min = min * 60;
                     float sec = Float.valueOf(seconds);
 
-                    float timeInSec = hours+min+sec;
+                    float timeInSec = (hours+min+sec);
+                    float timeInMs = timeInSec*1000;
 
-                    percentage.setValue((int)((timeInSec/duration)*100));
+                    percentage.setValue((int)(timeInMs/(float)duration)*100);
 
+                    Log.d("jakubko", "doWork timeInSec :"+ timeInMs + "percentage :" + percentage.getValue() + " duration :" + duration);
                 }
             }
 
             @Override
             public void onStart() {
                 super.onStart();
+                Log.w(null,"Cut started");
             }
 
             @Override
             public void onFinish() {
                 percentage.setValue(100);
+                Log.d("jakubko","Cutting video finished");
             }
 
         });
     }
 
-    @Override
-    public void onCreate(){
-        super.onCreate();
-        try {
-            loadFFmpegBinary();
-        } catch (FFmpegNotSupportedException e) {
-            e.printStackTrace();
-        }
-        percentage = new MutableLiveData<>();
-    }
-
     private void loadFFmpegBinary() throws FFmpegNotSupportedException {
         if(ffmpeg == null){
-            ffmpeg = FFmpeg.getInstance(this);
-
+            ffmpeg = FFmpeg.getInstance(getApplicationContext());
         }
-
         //Load the binary
         ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
 
@@ -147,29 +157,6 @@ public class FFMpegService extends Service {
             public void onFinish() {}
         });
 
-        }
-
-    public FFMpegService(){
-        super();
-    }
-
-    public class LocalBinder extends Binder {
-
-        public FFMpegService getServiceInstance(){
-            return FFMpegService.this;
-
-        }
-    }
-
-    public void registerClient(Activity activity){
-
-        this.activity = (Callbacks)activity;
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent){
-        return myBinder;
     }
 
     public MutableLiveData<Integer> getPercentage(){
@@ -177,10 +164,5 @@ public class FFMpegService extends Service {
         return percentage;
     }
 
-    public interface Callbacks
-    {
-        void updateClient(float data);
-    }
 
 }
-

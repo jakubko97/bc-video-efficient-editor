@@ -1,7 +1,13 @@
 package com.example.myapplication;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -24,10 +30,6 @@ public class ProgressBarActivity extends AppCompatActivity {
     String path;
     private TextView percentageBar;
 
-    ServiceConnection mConnection;
-    FFMpegService ffMpegService;
-    Integer res;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,63 +47,44 @@ public class ProgressBarActivity extends AppCompatActivity {
             command = i.getStringArrayExtra("command");
             path = i.getStringExtra("destination");
 
-            final Intent myIntent = new Intent(ProgressBarActivity.this, FFMpegService.class);
-            myIntent.putExtra("duration", String.valueOf(duration));
-            myIntent.putExtra("command", command);
-            myIntent.putExtra("destination", path);
-            startService(myIntent);
+            WorkRequest mRequest = new OneTimeWorkRequest.Builder(FFMpegService.class).setInputData(createInputData()).build();
 
-            mConnection = new ServiceConnection() {
+            WorkManager mWorkManager = WorkManager.getInstance();
+            WorkManager.getInstance().enqueue(mRequest);
+
+            mWorkManager.getWorkInfoByIdLiveData(mRequest.getId()).observe(this, new Observer<WorkInfo>() {
                 @Override
-                public void onServiceConnected(ComponentName name, IBinder iBinder) {
-                    FFMpegService.LocalBinder binder = (FFMpegService.LocalBinder) iBinder;
+                public void onChanged(@Nullable WorkInfo workInfo) {
+                    if (workInfo != null) {
+                        Integer res = workInfo.getOutputData().getInt("percentage",0);
 
-                    ffMpegService = binder.getServiceInstance();
-                    ffMpegService.registerClient(getParent());
 
-                    final Observer<Integer> resultObserver = new Observer<Integer>() {
-                        @Override
-                        public void onChanged(Integer integer) {
-                            res = integer;
-                            percentageBar.setText(res.toString()+'%');
-
-                            if(res<100){
+                        if(res<100){
                                 progressBar.setProgress(res);
-                            }
-                            if(res==100){
+                        }
+
+                        if(res==100){
                                 progressBar.setProgress(res);
-                                stopService(myIntent);
 
                                 Toast.makeText(getApplicationContext(),"Video trimmed successfully",Toast.LENGTH_LONG).show();
-                            }
+                         }
 
-                        }
-                    };
+                        Toast.makeText(getApplicationContext(),"workInfo "+res,Toast.LENGTH_LONG).show();
 
-                    ffMpegService.getPercentage().observe(ProgressBarActivity.this,resultObserver);
+                    }
                 }
-
-                @Override
-                public void onServiceDisconnected(ComponentName name) {
-
-                }
-
-                @Override
-                public void onBindingDied(ComponentName name) {
-
-                }
-
-                @Override
-                public void onNullBinding(ComponentName name) {
-
-                }
-
-            };
-
-            bindService(myIntent,mConnection, Context.BIND_AUTO_CREATE);
-
+            });
+//
         }
 
+    }
+
+    public Data createInputData(){
+        return new Data.Builder()
+                .putInt("duration", duration)
+                .putStringArray("command", command)
+                .putString("destination", path)
+                .build();
     }
 }
 
