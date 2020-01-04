@@ -41,6 +41,7 @@ public class VideoActivity extends AppCompatActivity {
     private Button btnonce, btnstop, btnplay, btntrim;
     private VideoView vv;
     private MediaController mediacontroller;
+    private String mode;
 
     SimpleExoPlayer player;
     private boolean isContinuously = false;
@@ -55,6 +56,7 @@ public class VideoActivity extends AppCompatActivity {
 
         if(i!=null){
             String imgPath = i.getStringExtra("uri");
+            mode = i.getStringExtra("mode");
             uri = Uri.parse(imgPath);
         }
 
@@ -63,6 +65,10 @@ public class VideoActivity extends AppCompatActivity {
         btnstop = (Button) findViewById(R.id.btnstop);
         btnplay = (Button) findViewById(R.id.btnplay);
         btntrim = (Button) findViewById(R.id.btntrim);
+
+        if(mode == "captureVideo"){
+            btntrim.setVisibility(View.INVISIBLE);
+        }
         //vv = (VideoView) findViewById(R.id.vv);
 
         mediacontroller = new MediaController(this);
@@ -83,34 +89,6 @@ public class VideoActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-
-
-        btnplay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               // vv.start();
-            }
-        });
-
-        btnonce.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                isContinuously = false;
-//                progressBar.setVisibility(View.VISIBLE);
-//                vv.setMediaController(mediacontroller);
-//                vv.setVideoURI(uri);
-//                vv.requestFocus();
-//                vv.start();
-            }
-        });
-
-//
-//        vv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//            // Close the progress bar and play the video
-//            public void onPrepared(MediaPlayer mp) {
-//                progressBar.setVisibility(View.GONE);
-//            }
-//        });
     }
 
     @Override
@@ -173,13 +151,13 @@ public class VideoActivity extends AppCompatActivity {
         MediaSource audio = new ExtractorMediaSource(rawResourceDataSource.getUri(), dataSourceFactory, new DefaultExtractorsFactory(), null, null);
         MediaSource video = new ExtractorMediaSource(uri, dataSourceFactory, new DefaultExtractorsFactory(), null, null);
 
-        player.setPlaybackParameters(new PlaybackParameters(0.5f));
+        player.setPlaybackParameters(new PlaybackParameters(1.0f));
+
 
         MergingMediaSource mergedMediaSource = new MergingMediaSource(video,audio);
 
         ConcatenatingMediaSource mergedSource = new ConcatenatingMediaSource();
         mergedSource.addMediaSource(mergedMediaSource);
-
         player.prepare(mergedSource);
 
 

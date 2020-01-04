@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
             Intent i = new Intent(MainActivity.this,VideoActivity.class);
             i.putExtra("uri",selectedUri.toString());
+            i.putExtra("mode","captureVideo");
             startActivity(i);
         }
 
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
             Intent i = new Intent(MainActivity.this,VideoActivity.class);
             i.putExtra("uri",selectedUri.toString());
+            i.putExtra("mode","openVideo");
             startActivity(i);
 
         }
