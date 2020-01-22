@@ -3,19 +3,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBlack">
+    android:orientation="vertical">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
     <com.google.android.exoplayer2.ui.SimpleExoPlayerView
         android:id="@+id/exoplayer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="630dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="200dp"
+        />
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="150dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="0dp"
+        android:orientation="horizontal"
         android:background="@color/colorAccent">
 
 
@@ -25,24 +38,24 @@
             rsb_progress_color="@color/colorPrimaryDark"
             rsb_progress_default_color="@color/colorPrimaryDark"
             rsb_tick_mark_text_color="@color/colorPrimaryDark"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginLeft="17dp"
             android:layout_marginRight="17dp" />
 
         <TextView
             android:id="@+id/tvvLeft"
-            android:layout_width="100dp"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="10dp"
             android:text="00:00:000"
-            android:textSize="16dp"></TextView>
+            android:textSize="14dp"></TextView>
 
         <TextView
             android:id="@+id/tvvRight"
-            android:layout_width="100dp"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
@@ -50,7 +63,20 @@
             android:layout_marginRight="15dp"
             android:gravity="end"
             android:text="00:00:000"
-            android:textSize="16dp"></TextView>
+            android:textSize="14dp"></TextView>
+
+        <TextView
+            android:id="@+id/tvCenter"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="152dp"
+            android:layout_marginRight="152dp"
+            android:gravity="center"
+            android:text="00:00:000"
+            android:textSize="14dp"></TextView>
 
     </RelativeLayout>
 </RelativeLayout>

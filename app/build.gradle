@@ -35,7 +35,7 @@ dependencies {
     implementation 'com.mikhaellopez:circularprogressbar:3.0.3'
     implementation 'com.writingminds:FFmpegAndroid:0.3.2'
     implementation 'com.google.android.exoplayer:exoplayer:2.10.7'
-    implementation "android.arch.work:work-runtime:1.0.0"
+    implementation "androidx.work:work-runtime:2.3.0-beta02"
 
 
 }

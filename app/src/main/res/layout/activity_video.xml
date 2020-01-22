@@ -11,29 +11,18 @@
         android:orientation="horizontal">
 
         <Button
-            android:layout_width="150dp"
+            android:layout_width="50dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnonce"
-            android:text="Start"/>
+            android:layout_height="50dp"
+            android:background="@mipmap/save_round"
+            android:id="@+id/btnsave" />
         <Button
-            android:layout_width="150dp"
+            android:layout_width="50dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnstop"
-            android:text="Stop"/>
-        <Button
-            android:layout_width="150dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnplay"
-            android:text="play"/>
-        <Button
-            android:layout_width="150dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:id="@+id/btntrim"
-            android:text="trim"/>
+            android:background="@mipmap/content_cut_round"
+            />
 
     </LinearLayout>
     <RelativeLayout

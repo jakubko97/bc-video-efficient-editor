@@ -2,4 +2,6 @@
     <string name="app_name">My Application</string>
     <string name="title_activity_video">VideoActivity</string>
     <string name="title_activity_trim">TrimActivity</string>
+    <string name="title_activity_camera_video_fragment">CameraVideoFragment</string>
+    <string name="title_activity_progress_bar">ProgressBar</string>
 </resources>

@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
@@ -9,17 +10,21 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
+
+import java.util.concurrent.Executor;
 
 
 public class ProgressBarActivity extends AppCompatActivity {
@@ -30,6 +35,10 @@ public class ProgressBarActivity extends AppCompatActivity {
     String path;
     private TextView percentageBar;
 
+    public ProgressBarActivity(){
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +46,6 @@ public class ProgressBarActivity extends AppCompatActivity {
 
         progressBar = (CircularProgressBar) findViewById(R.id.progressBar);
         percentageBar = (TextView) findViewById(R.id.percentageBar);
-        progressBar.setProgressMax(100);
 
         final Intent i = getIntent();
 
@@ -47,43 +55,47 @@ public class ProgressBarActivity extends AppCompatActivity {
             command = i.getStringArrayExtra("command");
             path = i.getStringExtra("destination");
 
-            WorkRequest mRequest = new OneTimeWorkRequest.Builder(FFMpegService.class).setInputData(createInputData()).build();
+            OneTimeWorkRequest mRequest = new OneTimeWorkRequest.Builder(FFMpegService.class).setInputData(createInputData(command)).build();
 
             WorkManager mWorkManager = WorkManager.getInstance();
-            WorkManager.getInstance().enqueue(mRequest);
+            mWorkManager.beginWith(mRequest).enqueue();
 
-            mWorkManager.getWorkInfoByIdLiveData(mRequest.getId()).observe(this, new Observer<WorkInfo>() {
+
+                    mWorkManager.getWorkInfoByIdLiveData(mRequest.getId()).observe(this, new Observer<WorkInfo>() {
                 @Override
                 public void onChanged(@Nullable WorkInfo workInfo) {
                     if (workInfo != null) {
-                        Integer res = workInfo.getOutputData().getInt("percentage",0);
+                        Data progress = workInfo.getProgress();
 
+                        int res = progress.getInt("progress", 0);
 
-                        if(res<100){
-                                progressBar.setProgress(res);
+                        Log.d("jakubko","WorkState = "+ workInfo.getState());
+                        Log.d("jakubko","result = "+ res);
+
+                        if(res < 100){
+
+                            progressBar.setProgress((float)res);
                         }
 
-                        if(res==100){
-                                progressBar.setProgress(res);
+                        if(res == 100){
 
-                                Toast.makeText(getApplicationContext(),"Video trimmed successfully",Toast.LENGTH_LONG).show();
+                            progressBar.setProgress((float)res);
+                            Toast.makeText(getApplicationContext(),"Video trimmed successfully2",Toast.LENGTH_LONG).show();
                          }
-
-                        Toast.makeText(getApplicationContext(),"workInfo "+res,Toast.LENGTH_LONG).show();
 
                     }
                 }
             });
-//
+
         }
 
     }
 
-    public Data createInputData(){
+
+    public Data createInputData(String[] command){
         return new Data.Builder()
-                .putInt("duration", duration)
                 .putStringArray("command", command)
-                .putString("destination", path)
+                .putInt("duration", duration)
                 .build();
     }
 }

@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -59,10 +60,11 @@ import java.io.File;
 public class TrimActivity extends AppCompatActivity {
 
     Uri uri;
+    Uri audioUri;
     String TAG = "jakubko";
     private SimpleExoPlayerView playerView;
     private SimpleExoPlayer player;
-    private TextView textViewLeft, textViewRight;
+    private TextView textViewLeft, textViewRight, textViewCenter;
     private boolean isPlaying;
     private boolean initValues = false;
     private Handler myHandler = new Handler();
@@ -74,6 +76,7 @@ public class TrimActivity extends AppCompatActivity {
     String[] command;
     File dest;
     String originalPath;
+    String audioPath;
 
 
     @Override
@@ -83,9 +86,11 @@ public class TrimActivity extends AppCompatActivity {
 
         textViewLeft = (TextView) findViewById(R.id.tvvLeft);
         textViewRight = (TextView) findViewById(R.id.tvvRight);
+        textViewCenter = (TextView) findViewById(R.id.tvCenter);
         rangeSeekBar = (RangeSeekBar) findViewById(R.id.rangeSeekBar);
 
         rangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
+
             @Override
             public void onRangeSeekBarValuesChanged(RangeSeekBar bar, Object minValue, Object maxValue) {
                 player.seekTo(((Number)minValue).longValue());
@@ -94,7 +99,7 @@ public class TrimActivity extends AppCompatActivity {
 
                 textViewLeft.setText(getTime(bar.getSelectedMinValue().intValue()));
                 textViewRight.setText(getTime(bar.getSelectedMaxValue().intValue()));
-
+                textViewCenter.setText(getTime(bar.getSelectedMaxValue().intValue()-bar.getSelectedMinValue().intValue()));
             }
         });
 
@@ -103,7 +108,9 @@ public class TrimActivity extends AppCompatActivity {
 
         if (i != null) {
             String imgPath = i.getStringExtra("uri");
+            String imgPath2 = i.getStringExtra("audioUri");
             uri = Uri.parse(imgPath);
+            audioUri = Uri.parse(imgPath2);
 
             isPlaying = true;
         }
@@ -126,7 +133,6 @@ public class TrimActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.trim) {
-
 
             final AlertDialog.Builder alert = new AlertDialog.Builder(TrimActivity.this);
 
@@ -188,11 +194,18 @@ public class TrimActivity extends AppCompatActivity {
         String fileExt = ".mp4";
         dest = new File(folder, filePrefix + fileExt);
         originalPath = getRealPathFromUri(getApplicationContext(), uri);
+        audioPath = "/storage/emulated/0/audios.mp3";
+
+        Log.d("jakubko", "audioPath = "+ audioPath);
 
         duration = (endMs - startMs);
-        Log.d("DEBUG", "Start Ms:" + startMs + "\nEnd Ms:" + endMs + "\nDuration:" + duration);
+
+        Log.d("jakubko", "Start Ms:" + startMs + "\nEnd Ms:" + endMs + "\nDuration:" + duration);
         Toast.makeText(getApplicationContext(), getTime(duration), Toast.LENGTH_LONG).show();
-        command = new String[]{"-ss", "" + getTime(startMs), "-y", "-i", originalPath, "-t", "" + getTime(duration), "-filter:v", "fps=fps=30", dest.getAbsolutePath()};
+
+        //command = new String[]{"-ss", "" + getTime(startMs), "-y", "-i", originalPath, "-t", "" + getTime(duration), "-r","24", dest.getAbsolutePath()};
+        //command = new String[]{"-i", originalPath, "-i", audioPath, "-map" ,"0:v", "-map", "1:a", "-c", "copy", "-shortest", "-filter:v" ,"setpts=0.5*PTS", dest.getAbsolutePath()};
+        command = new String[]{"-i", audioPath, "-ss", getTime(startMs), "-i", originalPath, "-r","30", "-c:v", "copy", "-c:a", "aac", "-shortest", dest.getAbsolutePath()};
 
     }
 
@@ -278,6 +291,7 @@ public class TrimActivity extends AppCompatActivity {
     };
 
     @Override
+
     public void onPause() {
         super.onPause();
         if (player != null) {
@@ -324,7 +338,7 @@ public class TrimActivity extends AppCompatActivity {
                 dataSourceFactory, extractorsFactory, null, null);
 
         player.addListener(eventListener);
-        player.setPlayWhenReady(true);
+        player.setPlayWhenReady(false);
         // Prepare the player with the source.
         player.prepare(videoSource);
         //myHandler.postDelayed(UpdateSongTime,100);
