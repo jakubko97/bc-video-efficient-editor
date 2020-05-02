@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.otaliastudios.cameraview.CameraView
+        android:id="@+id/camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:keepScreenOn="true"
+        app:cameraMode="video"
+        app:cameraVideoSizeMaxHeight="1200"
+        app:cameraVideoSizeMaxWidth="800"
+        app:cameraEngine="camera1"
+        app:cameraHdr="off"
+        app:cameraPreview="glSurface"
+        app:cameraAudio="on"
+        app:cameraFacing="front"
+        app:cameraFlash="off"
+        app:cameraWhiteBalance="auto"
+        app:cameraVideoCodec="deviceDefault"
+        app:cameraGestureLongTap="none"
+        app:cameraGesturePinch="none"
+        app:cameraGestureScrollHorizontal="none"
+        app:cameraGestureScrollVertical="none"
+        app:cameraGestureTap="autoFocus"
+        app:cameraGrid="off"
+        app:cameraPlaySounds="true"
+        app:cameraUseDeviceOrientation="true"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/videoOnlineImageButton"
+        android:contentDescription="@string/video_button"
+        android:src="@mipmap/btn_video_online"
+        android:layout_marginBottom="36dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_marginEnd="49dp" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/flip_facing_camera"
+        android:contentDescription="@string/flip_facing_camera"
+        android:src="@mipmap/flip_facing_camera_round"
+        android:layout_marginBottom="36dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="49dp" />
+
+    <Chronometer
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/chronometer"
+        android:visibility="invisible"
+        android:textColor="#ff0000"
+        android:textSize="25dp"
+        android:layout_above="@+id/videoOnlineImageButton"
+        android:layout_alignStart="@+id/videoOnlineImageButton" />
+
+
+</RelativeLayout>

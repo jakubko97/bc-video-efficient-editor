@@ -3,7 +3,6 @@ package com.example.myapplication;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,9 +20,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,13 +30,10 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
-import com.google.android.exoplayer2.source.ClippingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.MergingMediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -60,7 +54,6 @@ import java.io.File;
 public class TrimActivity extends AppCompatActivity {
 
     Uri uri;
-    Uri audioUri;
     String TAG = "jakubko";
     private SimpleExoPlayerView playerView;
     private SimpleExoPlayer player;
@@ -71,12 +64,14 @@ public class TrimActivity extends AppCompatActivity {
     private RangeSeekBar rangeSeekBar;
     MediaSource videoSource;
 
+    String mode;
     int duration;
     String filePrefix;
     String[] command;
     File dest;
     String originalPath;
     String audioPath;
+    Uri audioUri;
 
 
     @Override
@@ -86,7 +81,7 @@ public class TrimActivity extends AppCompatActivity {
 
         textViewLeft = (TextView) findViewById(R.id.tvvLeft);
         textViewRight = (TextView) findViewById(R.id.tvvRight);
-        textViewCenter = (TextView) findViewById(R.id.tvCenter);
+        textViewCenter = (TextView) findViewById(R.id.tvDuration);
         rangeSeekBar = (RangeSeekBar) findViewById(R.id.rangeSeekBar);
 
         rangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
@@ -107,10 +102,15 @@ public class TrimActivity extends AppCompatActivity {
         Intent i = getIntent();
 
         if (i != null) {
-            String imgPath = i.getStringExtra("uri");
-            String imgPath2 = i.getStringExtra("audioUri");
-            uri = Uri.parse(imgPath);
-            audioUri = Uri.parse(imgPath2);
+
+            uri = Uri.parse(i.getStringExtra("uri"));
+            mode = i.getStringExtra("mode");
+
+            if(mode.equals("withAudio")){
+                audioUri = Uri.parse(i.getStringExtra("audioUri"));
+            }
+
+
 
             isPlaying = true;
         }
@@ -146,17 +146,17 @@ public class TrimActivity extends AppCompatActivity {
             input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
             linearLayout.addView(input, lp);
 
-            alert.setMessage("Set video name");
-            alert.setTitle("Change video name");
+            alert.setMessage("Nastav názov videa");
+            alert.setTitle("Zmeň názov videa");
             alert.setView(linearLayout);
-            alert.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            alert.setNegativeButton("zruš", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                 }
             });
 
-            alert.setPositiveButton("submit", new DialogInterface.OnClickListener() {
+            alert.setPositiveButton("odoslať", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     filePrefix = input.getText().toString();
@@ -164,9 +164,10 @@ public class TrimActivity extends AppCompatActivity {
                     trimVideo(rangeSeekBar.getSelectedMinValue().intValue(),
                             rangeSeekBar.getSelectedMaxValue().intValue(), filePrefix);
 
-                    Intent myintent = new Intent(TrimActivity.this, ProgressBarActivity.class);
+                    Intent myintent = new Intent(TrimActivity.this, VideoActivity.class);
                     myintent.putExtra("duration", duration);
                     myintent.putExtra("command", command);
+                    myintent.putExtra("mode", "trimmedVideo");
                     myintent.putExtra("destination", dest.getAbsolutePath());
                     startActivity(myintent);
 
@@ -183,9 +184,8 @@ public class TrimActivity extends AppCompatActivity {
 
     private void trimVideo(int startMs, int endMs, String fileName) {
 
-        File folder = new File(Environment.getExternalStorageDirectory() + "/TrimVideos");
+        File folder = new File(Environment.getExternalStorageDirectory() + "/VideoEditor");
         if (!folder.exists()) {
-
             folder.mkdir();
         }
 
@@ -194,18 +194,24 @@ public class TrimActivity extends AppCompatActivity {
         String fileExt = ".mp4";
         dest = new File(folder, filePrefix + fileExt);
         originalPath = getRealPathFromUri(getApplicationContext(), uri);
-        audioPath = "/storage/emulated/0/audios.mp3";
+        audioPath = getRealPathFromUri(getApplicationContext(), audioUri);
 
-        Log.d("jakubko", "audioPath = "+ audioPath);
 
         duration = (endMs - startMs);
 
         Log.d("jakubko", "Start Ms:" + startMs + "\nEnd Ms:" + endMs + "\nDuration:" + duration);
         Toast.makeText(getApplicationContext(), getTime(duration), Toast.LENGTH_LONG).show();
 
-        //command = new String[]{"-ss", "" + getTime(startMs), "-y", "-i", originalPath, "-t", "" + getTime(duration), "-r","24", dest.getAbsolutePath()};
+        if(audioUri != null ){
+            command = new String[]{"-i", audioPath, "-ss", getTime(startMs), "-i", originalPath,"-t", "" + getTime(duration), "-r","30", "-c:v", "copy", "-c:a", "aac", "-shortest", dest.getAbsolutePath()};
+        }else{
+            //zvolenie strihanie audio/video suboru, ale bez pridaneho audia
+
+            command = new String[]{"-ss", "" + getTime(startMs), "-y", "-i", originalPath, "-t", "" + getTime(duration), "-c:v", "libx264", "-preset", "ultrafast", "-crf", "17", "-c:a", "copy", dest.getAbsolutePath()};
+            //command = new String[]{"-ss", "" + getTime(startMs), "-y", "-i", originalPath, "-t", "" + getTime(duration), "-r" , "30", "-filter:v", "setpts=(1/3)*PTS", dest.getAbsolutePath()};
+        }
+
         //command = new String[]{"-i", originalPath, "-i", audioPath, "-map" ,"0:v", "-map", "1:a", "-c", "copy", "-shortest", "-filter:v" ,"setpts=0.5*PTS", dest.getAbsolutePath()};
-        command = new String[]{"-i", audioPath, "-ss", getTime(startMs), "-i", originalPath, "-r","30", "-c:v", "copy", "-c:a", "aac", "-shortest", dest.getAbsolutePath()};
 
     }
 
@@ -259,7 +265,7 @@ public class TrimActivity extends AppCompatActivity {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            Log.i(TAG,"onPlayerStateChanged: playWhenReady = "+String.valueOf(playWhenReady)
+            Log.i(TAG,"onPlayerStateChanged: playWhenReady = "+(playWhenReady)
                     +" playbackState = "+playbackState);
             switch (playbackState){
                 case ExoPlayer.STATE_ENDED:
@@ -338,7 +344,7 @@ public class TrimActivity extends AppCompatActivity {
                 dataSourceFactory, extractorsFactory, null, null);
 
         player.addListener(eventListener);
-        player.setPlayWhenReady(false);
+        player.setPlayWhenReady(true);
         // Prepare the player with the source.
         player.prepare(videoSource);
         //myHandler.postDelayed(UpdateSongTime,100);

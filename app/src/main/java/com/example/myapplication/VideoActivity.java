@@ -7,39 +7,33 @@ import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
-import android.widget.ProgressBar;
-import android.widget.Toast;
-import android.widget.VideoView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.MergingMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
@@ -53,6 +47,7 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
 import com.google.android.exoplayer2.util.Util;
+import com.otaliastudios.cameraview.VideoResult;
 
 import java.io.File;
 
@@ -60,113 +55,132 @@ public class VideoActivity extends AppCompatActivity {
 
     Uri uri;
     Uri audioUri;
-    private Button btntrim, btnsave;
     private String mode;
     SimpleExoPlayer player;
-    double duration;
+    int duration;
     File dest;
-    String filePrefix;
+
+    String[] command;
+    String path;
+
+    private static VideoResult videoResult;
+
+    public static void setVideoResult(@Nullable VideoResult result) {
+        videoResult = result;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
 
-        Intent i = getIntent();
+        final VideoResult result = videoResult;
 
-        if(i!=null){
+        final Intent i = getIntent();
+
+        if(i!=null) {
             String imgPath = i.getStringExtra("uri");
             mode = i.getStringExtra("mode");
-            uri = Uri.parse(imgPath);
-        }
 
-        btntrim = (Button) findViewById(R.id.btntrim);
-        btnsave = (Button) findViewById(R.id.btnsave);
+            duration = i.getIntExtra("duration", 0);
+            command = i.getStringArrayExtra("command");
+            path = i.getStringExtra("destination");
 
-        Log.d("jakubko",mode+"= captureVideo");
-        if(mode.equals("captureVideo")){
-            btntrim.setEnabled(false);
-        }
+            if(mode.equals("trimmedVideo")){
+                uri = Uri.parse(path);
 
-        btntrim.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(VideoActivity.this,TrimActivity.class);
-                i.putExtra("uri",uri.toString());
-                i.putExtra("audioUri",audioUri.toString());
-                startActivity(i);
-            }
-        });
+                OneTimeWorkRequest mRequest = new OneTimeWorkRequest.Builder(FFMpegWorker.class).setInputData(createInputData()).build();
 
-        btnsave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                WorkManager mWorkManager = WorkManager.getInstance();
 
-                final AlertDialog.Builder alert = new AlertDialog.Builder(VideoActivity.this);
+                mWorkManager.enqueue(mRequest);
 
-                LinearLayout linearLayout = new LinearLayout(VideoActivity.this);
-                linearLayout.setOrientation(LinearLayout.VERTICAL);
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                lp.setMargins(50, 0, 100, 0);
-                final EditText input = new EditText(VideoActivity.this);
-                input.setLayoutParams(lp);
-                input.setGravity(Gravity.TOP | Gravity.START);
-                input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-                linearLayout.addView(input, lp);
+                mWorkManager.getWorkInfoByIdLiveData(mRequest.getId()).observe(this, workInfo -> {
+                    if (workInfo.getState() == WorkInfo.State.RUNNING) {
 
-                alert.setMessage("Set video name");
-                alert.setTitle("Change video name");
-                alert.setView(linearLayout);
-                alert.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                        Data progress = workInfo.getProgress();
+
+                        int res = progress.getInt("progress", 0);
+
+                        Log.d("jakubko", "WorkState = " + workInfo.getState());
+                        Log.d("jakubko", "result = " + res);
+
+                        //Intent mediaStoreUpdateIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        //mediaStoreUpdateIntent.setData(Uri.fromFile(new File(path)));
+                        //sendBroadcast(mediaStoreUpdateIntent);
                     }
                 });
+            }
+            else if(mode.equals("captureVideo")){
+                //uri = Uri.parse(imgPath);
+                uri = Uri.fromFile(videoResult.getFile());
+            }
 
-                alert.setPositiveButton("save", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
 
-                        filePrefix = input.getText().toString();
+        }
 
-                        File folder = new File(Environment.getExternalStorageDirectory() + "/SavedVideos");
-                        if (!folder.exists()) {
+    }
 
-                            folder.mkdir();
-                        }
+    public Data createInputData(){
+        return new Data.Builder()
+                .putStringArray("command", command)
+                .putString("dest", path)
+                .putInt("duration", duration)
+                .build();
+    }
 
-                        String fileExt = ".mp4";
-                        dest = new File(folder, filePrefix + fileExt);
-                        String originalPath = getRealPathFromUri(getApplicationContext(), uri);
-                        String audioPath = "/storage/emulated/0/audios.mp3";
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.video_preview, menu);
+        return true;
+    }
 
-                        int audioDuration = getDurationOfFile(audioPath);
-                        int videoDuration = getDurationOfFile(originalPath);
-                        double coef = (double)audioDuration/(double)videoDuration;
-                        duration = coef*(double)videoDuration;
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.btnShare) {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+            sendIntent.putExtra(Intent.EXTRA_STREAM, uri); // for media share
+            sendIntent.setType("video/*");
 
-                        //String[] command = new String[]{"-i", originalPath, "-i", audioPath, "-map" ,"0:v", "-map", "1:a", "-c", "copy", "-shortest", dest.getAbsolutePath()};
-                        String[] command = new String[]{"-i", originalPath, "-filter_complex", "setpts=PTS*"+coef+"[v]", "-map", "[v]", "-b:v", "2097k" ,"-r", "60", dest.getAbsolutePath()};
-                        Log.d("jakubko","coeficient = "+coef);
-                        Log.d("jakubko","videoDuration = "+videoDuration);
+            Intent shareIntent = Intent.createChooser(sendIntent, null);
+            startActivity(shareIntent);
+        }
+        else if(item.getItemId() == R.id.delete){
 
-                        Intent saveIntent = new Intent(VideoActivity.this, ProgressBarActivity.class);
-                        saveIntent.putExtra("duration", (int)duration);
+            final AlertDialog.Builder alert = new AlertDialog.Builder(VideoActivity.this);
 
-                        saveIntent.putExtra("command", command);
-                        startActivity(saveIntent);
+            LinearLayout linearLayout = new LinearLayout(VideoActivity.this);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(50, 0, 100, 0);
+
+            alert.setMessage("Ste si istý že chcete vymazať video?");
+            alert.setView(linearLayout);
+            alert.setNegativeButton("ZRUŠIŤ", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+            alert.setPositiveButton("POTVRDIŤ", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if(videoResult.getFile().exists()){
+                        videoResult.getFile().delete();
                         finish();
                         dialog.dismiss();
-
                     }
-                });
+                }
+            });
 
-                alert.show();
+            alert.show();
 
-
-            }
-        });
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public int getDurationOfFile(String filePath){
@@ -216,6 +230,7 @@ public class VideoActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
         try {
             initializePlayer();
         } catch (RawResourceDataSource.RawResourceDataSourceException e) {
@@ -272,42 +287,16 @@ public class VideoActivity extends AppCompatActivity {
 
         audioUri = rawResourceDataSource.getUri();
 
-        MediaSource audio = new ExtractorMediaSource(audioUri, dataSourceFactory, new DefaultExtractorsFactory(), null, null);
+        //MediaSource audio = new ExtractorMediaSource(audioUri, dataSourceFactory, new DefaultExtractorsFactory(), null, null);
         MediaSource video = new ExtractorMediaSource(uri, dataSourceFactory, new DefaultExtractorsFactory(), null, null);
 
-        player.setPlaybackParameters(new PlaybackParameters(1.0f));
+        //MergingMediaSource mergedMediaSource = new MergingMediaSource(video,audio);
 
-        MergingMediaSource mergedMediaSource = new MergingMediaSource(video,audio);
-
-        ConcatenatingMediaSource mergedSource = new ConcatenatingMediaSource();
-        mergedSource.addMediaSource(mergedMediaSource);
+        //ConcatenatingMediaSource mergedSource = new ConcatenatingMediaSource();
+        //mergedSource.addMediaSource(mergedMediaSource);
 
         player.prepare(video);
 
     }
 
-//    private void workManager(String[] command){
-//        WorkRequest mRequest = new OneTimeWorkRequest.Builder(FFMpegService.class).setInputData(createInputData(command)).build();
-//
-//        WorkManager mWorkManager = WorkManager.getInstance();
-//        WorkManager.getInstance().enqueue(mRequest);
-//
-//        mWorkManager.getWorkInfoByIdLiveData(mRequest.getId()).observe(this, new Observer<WorkInfo>() {
-//            @Override
-//            public void onChanged(@Nullable WorkInfo workInfo) {
-//                if (workInfo != null && WorkInfo.State.SUCCEEDED == workInfo.getState()) {
-//                    Data progress = workInfo.getProgress();
-//
-//                        Toast.makeText(getApplicationContext(),"Video connected successfully",Toast.LENGTH_LONG).show();
-//
-//                }
-//            }
-//        });
-//    }
-
-//    private Data createInputData(String[] command){
-//        return new Data.Builder()
-//                .putStringArray("command", command)
-//                .build();
-//    }
 }

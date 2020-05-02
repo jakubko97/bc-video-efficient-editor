@@ -1,30 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.myapplication">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature
-        android:name="android.hardware.camera2"
-        android:required="true" />
+        android:name="android.hardware.camera"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false"/>
+
+    <uses-sdk tools:overrideLibrary="com.otaliastudios.opengl" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/app_icon"
         android:label="Video Editor"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".CameraActivity"></activity>
+        <activity
+            android:name=".DetailVideoActivity"
+            android:label="@string/title_activity_detail_video"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".TrimActivity"
             android:icon="@mipmap/ic_pause"
             android:label="@string/title_activity_trim"
+            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".VideoActivity"
             android:label="@string/title_activity_video"
+            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme" />
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -34,7 +56,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".FFMpegService" />
+        <service android:name=".FFMpegWorker" />
     </application>
 
 </manifest>

@@ -1,17 +1,16 @@
 package com.example.myapplication;
-
+import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
+import android.provider.OpenableColumns;
 import android.view.View;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,8 +18,6 @@ public class MainActivity extends AppCompatActivity {
     Uri selectedUri;
     Uri selectedAudio;
     private Button openVideo, captureVideo, setAudio;
-    int audioDuration;
-    MediaPlayer audio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,27 +28,18 @@ public class MainActivity extends AppCompatActivity {
         captureVideo = (Button) findViewById(R.id.captureVideo);
         setAudio = (Button) findViewById(R.id.setAudio);
 
-        audio = MediaPlayer.create(this, R.raw.audios);
-        audioDuration = audio.getDuration()/1000;
-
-
-        Log.d("audio", "audio duration: ");
 
         openVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openVideo(v);
+                openVideo();
             }
         });
 
         captureVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    captureVideo(v);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                captureVideo();
             }
         });
 
@@ -64,20 +52,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void captureVideo() {
 
-    private void captureVideo(View v) throws IOException {
-
-        Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        videoIntent.putExtra("android.intent.extra.durationLimit", audioDuration);
-
-        if(videoIntent.resolveActivity(getPackageManager()) != null){
-
-            startActivityForResult(videoIntent,VIDEO_REQUEST);
-
-        }
+        Intent i = new Intent(MainActivity.this,CameraActivity.class);
+//        i.putExtra("uriAudio",selectedAudio.toString());
+//        i.putExtra("mode","withAudio");
+        startActivity(i);
     }
 
-    private void openVideo(View v){
+    private void openVideo(){
 
         Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         i.setType("video/mp4");
@@ -87,9 +70,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void setAudio(View v){
 
-        Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        i.setType("audio/mp3");
-        startActivityForResult(i,102);
+        Intent intent_upload = new Intent();
+        intent_upload.setType("audio/*");
+        intent_upload.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent_upload,1);
 
     }
 
@@ -101,28 +85,68 @@ public class MainActivity extends AppCompatActivity {
 
             selectedUri = data.getData();
 
-            Intent i = new Intent(MainActivity.this,VideoActivity.class);
+            Intent i = new Intent(MainActivity.this,TrimActivity.class);
             i.putExtra("uri",selectedUri.toString());
-            i.putExtra("mode","openVideo");
+
+            if(selectedAudio != null){
+                i.putExtra("audioUri",selectedAudio.toString());
+                i.putExtra("mode","withAudio");
+            }else{
+                i.putExtra("mode","noAudio");
+            }
+
             startActivity(i);
         }
 
-        if(requestCode==VIDEO_REQUEST && resultCode==RESULT_OK){
 
-            selectedUri = data.getData();
+        if(requestCode == 1){
 
-            Intent i = new Intent(MainActivity.this,VideoActivity.class);
-            i.putExtra("uri",selectedUri.toString());
-            i.putExtra("mode","captureVideo");
-            startActivity(i);
+            if(resultCode == RESULT_OK){
 
+                //the selected audio.
+                selectedAudio = data.getData();
+
+                if(selectedAudio != null){
+                    setAudio.setText(getFileName(selectedAudio));
+                }
+            }
         }
-        if(requestCode == 102 && resultCode == RESULT_OK){
+    }
 
-            selectedAudio = data.getData();
-
-            Log.d("audio", "Selected audio: "+ selectedAudio);
+    public static String getFileName(Uri uri) {
+        if (uri == null) return null;
+        String fileName = null;
+        String path = uri.getPath();
+        int cut = path.lastIndexOf('/');
+        if (cut != -1) {
+            fileName = path.substring(cut + 1);
         }
+        return fileName.toLowerCase();
+    }
+
+    public static String getSize(Context context, Uri uri) {
+        String fileSize = null;
+        Cursor cursor = context.getContentResolver()
+                .query(uri, null, null, null, null, null);
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+
+                // get file size
+                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                if (!cursor.isNull(sizeIndex)) {
+                    fileSize = cursor.getString(sizeIndex);
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+        // Convert the bytes to Kilobytes (1 KB = 1024 Bytes)
+        long fileSizeInKB = Integer.valueOf(fileSize) / 1024;
+// Convert the KB to MegaBytes (1 MB = 1024 KBytes)
+        long fileSizeInMB = fileSizeInKB / 1024;
+
+
+        return fileSizeInMB+" MB";
     }
 
 }

@@ -4,8 +4,7 @@
 
     <item
         android:id="@+id/trim"
-        android:title="Trim"
+        android:title="POTVRDIŤ"
         app:showAsAction="always">
     </item>
-
 </menu>

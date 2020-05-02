@@ -4,4 +4,8 @@
     <string name="title_activity_trim">TrimActivity</string>
     <string name="title_activity_camera_video_fragment">CameraVideoFragment</string>
     <string name="title_activity_progress_bar">ProgressBar</string>
+    <string name="title_activity_detail_video">DetailVideoActivity</string>
+    <string name="video_button">Video Record Button</string>
+    <string name="camera_button">Camera Capture Button</string>
+    <string name="flip_facing_camera">Flip Facing Camera</string>
 </resources>
