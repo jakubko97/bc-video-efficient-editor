@@ -1,171 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:rsb="http://schemas.android.com/apk/res-auto"
-    android:weightSum="14"
+    android:weightSum="10"
     android:orientation="vertical"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:theme="@style/AppTheme.AppBarOverlay"
+>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
+        android:background="@color/colorGrey"
         android:layout_weight="7">
 
         <com.google.android.exoplayer2.ui.SimpleExoPlayerView
             android:id="@+id/exoplayer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:fadingEdge="horizontal"
             />
 
-
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/colorPrimary"
+        android:background="@color/primaryColor"
         android:gravity="center"
         android:orientation="vertical"
         >
-    <RelativeLayout
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
-        android:orientation="horizontal"
-        android:layout_gravity="center_horizontal"
-        >
 
         <TextView
-            android:id="@+id/tvvLeft"
+            android:id="@+id/tvDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="10dp"
             android:singleLine="true"
-            android:textColor="@color/colorWhite"
-            android:text="00:00:000 s -"
+            android:textColor="@color/primaryTextColor"
+            android:text="@string/start_time_value"
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tvvRight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:textColor="@color/colorWhite"
-            android:layout_toRightOf="@id/tvvLeft"
-            android:text="00:00:000 s"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        </RelativeLayout>
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/colorPrimary"
-        android:gravity="center"
-        android:orientation="vertical"
-        >
-
-        <RelativeLayout
-            android:layout_width="240dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="@color/colorPrimary"
-            android:gravity="center"
-            >
-
-            <TextView
-                android:id="@+id/durationText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
-                android:layout_marginRight="10dp"
-                android:singleLine="true"
-                android:text="Dĺžka: "
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-        </RelativeLayout>
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/colorPrimary"
-        android:orientation="vertical"
-        >
-        <RelativeLayout
-            android:layout_width="240dp"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            >
-
-
-            <TextView
-                android:id="@+id/tvDuration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:text=""
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-        </RelativeLayout>
-
-    </RelativeLayout>
-
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:background="@color/colorPrimary">
-
-        <TextView
-            android:id="@+id/selectRangeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_margin="12dp"
-            android:text="Nastav rozsah"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-
-    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_alignParentBottom="true"
         android:layout_marginBottom="0dp"
         android:layout_weight="2"
-        android:background="@color/colorPrimary">
+        android:background="@color/primaryColor">
 
-        <org.florescu.android.rangeseekbar.RangeSeekBar
-            android:id="@+id/rangeSeekBar"
+        <TextView
+            android:id="@+id/tvvLeft"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="10dp"
+            android:singleLine="true"
+            android:textColor="@color/primaryTextColor"
+            android:text="@string/start_time_value"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/tvvRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="@string/start_time_value"
+            android:layout_marginEnd="12dp"
+            android:textColor="@color/primaryTextColor"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar
+            android:id="@+id/rangeSeekbar1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginLeft="17dp"
             android:layout_marginRight="17dp"
-
             />
 
     </RelativeLayout>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:rsb="http://schemas.android.com/apk/res-auto"
+    android:weightSum="10"
+    android:orientation="vertical"
+   >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_marginBottom="18dp"
+        android:layout_gravity="center"
+        android:layout_weight="6">
+
+        <ImageView
+            android:id="@+id/videoPreviewImage"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:src="@mipmap/album_round"
+            android:layout_marginBottom="12dp"
+            android:layout_centerInParent="true"
+            android:contentDescription="@string/image_audio_preview" />
+            <TextView
+                android:id="@+id/audioName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primaryDarkColor"
+                android:textSize="18sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="@string/default_title"
+                android:layout_marginHorizontal="10dp"
+                android:layout_below="@+id/videoPreviewImage"
+                android:gravity="center"
+                >I</TextView>
+
+
+        </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/audioSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            >
+        </androidx.appcompat.widget.AppCompatSeekBar>
+
+        <TextView
+            android:id="@+id/currentPositionAudio"
+            android:layout_above="@+id/audioSeekBar"
+            android:layout_width="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="20dp"
+            android:text="@string/start_time_value_2"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/durationAudio"
+            android:layout_above="@+id/audioSeekBar"
+            android:layout_width="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/start_time_value_2"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        >
+
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/play_foreground"
+            android:id="@+id/play" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_weight="2">
+
+       <Button
+           android:id="@+id/stornoAudio"
+           android:layout_width="150dp"
+           android:layout_height="50dp"
+           android:text="@string/cancel"
+           android:layout_marginEnd="30dp"
+           android:textColor="@color/primaryTextColor"
+           android:background="@drawable/gradient2"
+          >
+
+       </Button>
+
+        <Button
+            android:id="@+id/confirmAudio"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:text="@string/confirm"
+            android:textColor="@color/primaryTextColor"
+            android:background="@drawable/gradient2"
+            android:layout_toEndOf="@+id/stornoAudio">
+
+        </Button>
+
+    </RelativeLayout>
+
+
+</LinearLayout>

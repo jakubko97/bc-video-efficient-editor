@@ -11,47 +11,25 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:keepScreenOn="true"
-        app:cameraMode="video"
-        app:cameraVideoSizeMaxHeight="1200"
-        app:cameraVideoSizeMaxWidth="800"
-        app:cameraEngine="camera1"
-        app:cameraHdr="off"
-        app:cameraPreview="glSurface"
         app:cameraAudio="on"
+        app:cameraEngine="camera1"
         app:cameraFacing="front"
         app:cameraFlash="off"
-        app:cameraWhiteBalance="auto"
-        app:cameraVideoCodec="deviceDefault"
         app:cameraGestureLongTap="none"
         app:cameraGesturePinch="none"
         app:cameraGestureScrollHorizontal="none"
         app:cameraGestureScrollVertical="none"
         app:cameraGestureTap="autoFocus"
         app:cameraGrid="off"
+        app:cameraHdr="off"
+        app:cameraMode="video"
         app:cameraPlaySounds="true"
-        app:cameraUseDeviceOrientation="true"/>
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/videoOnlineImageButton"
-        android:contentDescription="@string/video_button"
-        android:src="@mipmap/btn_video_online"
-        android:layout_marginBottom="36dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
-        android:layout_marginEnd="49dp" />
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/flip_facing_camera"
-        android:contentDescription="@string/flip_facing_camera"
-        android:src="@mipmap/flip_facing_camera_round"
-        android:layout_marginBottom="36dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginEnd="49dp" />
+        app:cameraPreview="glSurface"
+        app:cameraUseDeviceOrientation="true"
+        app:cameraVideoCodec="deviceDefault"
+        app:cameraVideoSizeMaxHeight="1200"
+        app:cameraVideoSizeMaxWidth="800"
+        app:cameraWhiteBalance="auto" />
 
     <Chronometer
         android:layout_width="wrap_content"
@@ -59,9 +37,46 @@
         android:id="@+id/chronometer"
         android:visibility="invisible"
         android:textColor="#ff0000"
-        android:textSize="25dp"
-        android:layout_above="@+id/videoOnlineImageButton"
-        android:layout_alignStart="@+id/videoOnlineImageButton" />
+        android:textSize="25sp"
+        android:layout_marginTop="8dp"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        />
 
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:rowCount="1"
+        android:columnCount="3"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        >
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:id="@+id/flash"
+            android:background="@drawable/flash_foreground" />
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="170dp"
+            android:layout_height="170dp"
+            android:id="@+id/videoOnlineImageButton"
+            android:background="@drawable/btn_video_online_foreground"
+            android:layout_gravity="center_horizontal" />
+
+
+        <com.google.android.material.button.MaterialButton
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/flip_facing_camera"
+        android:contentDescription="@string/flip_facing_camera"
+        android:background="@drawable/flip_facing_camera_foreground" />
+
+
+
+
+    </GridLayout>
 
 </RelativeLayout>

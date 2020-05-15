@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/trim"
-        android:title="POTVRDIŤ"
+        android:title="@string/confirm"
         app:showAsAction="always">
     </item>
 </menu>

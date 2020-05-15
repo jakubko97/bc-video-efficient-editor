@@ -1,63 +1,289 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/gradient2"
+    tools:context="sk.fei.videoeditor.activities.MainActivity">
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-    <Button
-        android:id="@+id/setAudio"
         android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:text="Nastav audio"
-        android:background="@color/colorGrey"
-        android:layout_marginBottom="@dimen/fab_margin"
-        android:drawableLeft="@drawable/search_audio_foreground"
-        android:gravity="center"
-
-        />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="vertical">
+    
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="13dp"
+            android:layout_marginRight="22dp"
+            android:layout_marginLeft="22dp"
+            android:layout_marginBottom="13dp"
+            >
+            <TextView
+                android:id="@+id/homeTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/my_video_editor"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28sp"
+                >I</TextView>
+            <TextView
+                android:layout_marginTop="6dp"
+                android:layout_below="@+id/homeTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/created_by_jj"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="14sp"
+                >I</TextView>
 
-    <Button
-        android:id="@+id/openVideo"
+            <ImageView
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_alignParentEnd="true"
+                android:src="@mipmap/app_icon_foreground"
+                android:contentDescription="@string/app_icon" />
+        </RelativeLayout>
+        
+    <GridLayout
         android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:background="@color/colorGrey"
-        android:text="vyber video z galerie"
-        android:layout_marginBottom="@dimen/fab_margin"
-        android:drawableLeft="@drawable/search_video_foreground"
-        android:gravity="center"
-
-        />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:columnCount="2"
+        android:requiresFadingEdge="horizontal"
+        android:rowCount="3"
+        android:elevation="8dp"
+        android:columnOrderPreserved="false"
+        android:alignmentMode="alignMargins"
 
-    <Button
-        android:id="@+id/captureVideo"
-        android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:text="Nahraj video"
-        android:background="@color/colorGrey"
-        android:layout_marginBottom="@dimen/fab_margin"
-        android:drawableLeft="@drawable/record_video_foreground"
-        android:gravity="center"
+       >
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/setAudio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardElevation="6dp"
+            app:cardCornerRadius="12dp"
+            android:layout_margin="12dp"
+            >
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/audio_track_foreground"
+                    android:contentDescription="@string/audio_image" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textSize="20sp"
+                    android:text="@string/select_audio"
+                    android:textColor="@color/primaryColor" />
 
 
-        />
+            </LinearLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/recordVideo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardElevation="6dp"
+            app:cardCornerRadius="12dp"
+            android:layout_margin="12dp"
+            >
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/record_video_foreground"
+
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textSize="20sp"
+                    android:text="@string/record_video"
+                    android:textColor="@color/primaryColor" />
+            </LinearLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/openVideo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardElevation="6dp"
+            app:cardCornerRadius="12dp"
+            android:layout_margin="12dp"
+            >
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/search_video_foreground"
+
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textSize="20sp"
+                    android:text="@string/select_video"
+                    android:textColor="@color/primaryColor" />
+
+
+            </LinearLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/about"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardElevation="6dp"
+            app:cardCornerRadius="12dp"
+            android:layout_margin="12dp"
+            >
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/info_foreground"
+
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textSize="20sp"
+                    android:text="@string/about"
+                    android:textColor="@color/primaryColor" />
+            </LinearLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/myVideos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardElevation="6dp"
+            app:cardCornerRadius="12dp"
+            android:layout_margin="12dp"
+            >
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/video_collection_foreground"
+                     />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textSize="20sp"
+                    android:text="@string/my_videos"
+                    android:textColor="@color/primaryColor" />
+            </LinearLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardElevation="6dp"
+            app:cardCornerRadius="12dp"
+            android:layout_margin="12dp"
+            >
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/help_foreground"
+
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textSize="20sp"
+                    android:text="@string/help"
+                    android:textColor="@color/primaryColor" />
+            </LinearLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+    </GridLayout>
 
     </LinearLayout>
-
-</LinearLayout>
+    
+</ScrollView>

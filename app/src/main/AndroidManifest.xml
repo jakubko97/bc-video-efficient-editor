@@ -1,62 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.myapplication">
+    package="sk.fei.videoeditor">
+
+    <uses-sdk tools:overrideLibrary="com.otaliastudios.opengl" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission
+        android:name="android.permission.FLASHLIGHT"
+        android:permissionGroup="android.permission-group.HARDWARE_CONTROLS"
+        android:protectionLevel="normal" />
 
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false"/>
+        android:required="false" />
     <uses-feature
         android:name="android.hardware.camera.autofocus"
-        android:required="false"/>
+        android:required="false" />
     <uses-feature
         android:name="android.hardware.camera.front"
-        android:required="false"/>
+        android:required="false" />
     <uses-feature
         android:name="android.hardware.microphone"
-        android:required="false"/>
-
-    <uses-sdk tools:overrideLibrary="com.otaliastudios.opengl" />
+        android:required="false" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/app_icon"
-        android:label="Video Editor"
+        android:label="@string/app_name"
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".CameraActivity"></activity>
+        android:theme="@style/AppTheme"
+        android:fullBackupContent="@xml/backup_descriptor">
         <activity
-            android:name=".DetailVideoActivity"
-            android:label="@string/title_activity_detail_video"
+            android:name=".activities.Help"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme"
+            android:label="@string/help" />
+        <activity
+            android:name=".activities.VideoViewActivity"
             android:screenOrientation="fullSensor"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/FullscreenTheme"
+           />
+        <activity
+            android:name=".activities.AudioPreview"
+            android:label="@string/audio_preview_activity"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="sk.fei.videoeditor.activities.MediaFileDetail" />
+        </activity>
+        <activity
+            android:name=".activities.MediaFileDetail"
+            android:label="@string/my_music"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:resource="@xml/searchable"
+                android:value="sk.fei.videoeditor.activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activities.AboutActivity"
+            android:label="@string/about"
+            android:parentActivityName=".activities.MainActivity"
+            android:screenOrientation="fullSensor">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="sk.fei.videoeditor.activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activities.CameraActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".TrimActivity"
+            android:name=".activities.TrimActivity"
             android:icon="@mipmap/ic_pause"
             android:label="@string/title_activity_trim"
+            android:parentActivityName=".activities.MediaFileDetail"
             android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".VideoActivity"
+            android:name=".activities.VideoActivity"
             android:label="@string/title_activity_video"
             android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme" />
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".activities.MainActivity"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service android:name=".FFMpegWorker" />
     </application>
 
 </manifest>

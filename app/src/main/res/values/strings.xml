@@ -1,11 +1,54 @@
 <resources>
-    <string name="app_name">My Application</string>
-    <string name="title_activity_video">VideoActivity</string>
-    <string name="title_activity_trim">TrimActivity</string>
-    <string name="title_activity_camera_video_fragment">CameraVideoFragment</string>
-    <string name="title_activity_progress_bar">ProgressBar</string>
+    <string name="app_name">Video Editor</string>
+    <string name="title_activity_video">Video preview</string>
+    <string name="title_activity_trim">Trim Video</string>
+    <string name="about">About</string>
+    <string name="audio_preview_activity">Audio Preview</string>
+    <string name="my_media">My Media</string>
+    <string name="my_music">My Music</string>
+    <string name="my_videos">My Videos</string>
+    <string name="my_created_videos">My Created Videos</string>
+    <string name="help">Help</string>
+    <string name="video_preview">Video Preview</string>
+
     <string name="title_activity_detail_video">DetailVideoActivity</string>
     <string name="video_button">Video Record Button</string>
     <string name="camera_button">Camera Capture Button</string>
     <string name="flip_facing_camera">Flip Facing Camera</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="audio_suffix">.mp3</string>
+    <string name="video_suffix">.mp4</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="start_time_value">00:00:000</string>
+    <string name="image_audio_preview">Image Audio Preview</string>
+    <string name="default_title">default title</string>
+    <string name="start_time_value_2">00.00</string>
+    <string name="cancel">cancel</string>
+    <string name="confirm">confirm</string>
+    <string name="no_items">No Items</string>
+    <string name="no_video_created">No Video Created</string>
+    <string name="search">Search</string>
+    <string name="save">save</string>
+    <string name="thumbnail">Thumbnail</string>
+    <string name="my_video_editor">My Video Editor</string>
+    <string name="created_by_jj">created by Jakub Jančík</string>
+    <string name="app_icon">Application icon</string>
+    <string name="audio_image">Audio Image</string>
+    <string name="select_audio">Select audio</string>
+    <string name="select_video">Select video</string>
+    <string name="record_video">Record video</string>
 </resources>
