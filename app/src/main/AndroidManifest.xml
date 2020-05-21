@@ -30,45 +30,51 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="@xml/backup_descriptor">
+        android:theme="@style/AppTheme">
+        <activity android:name=".activities.GalleryRecycleView"></activity>
         <activity
             android:name=".activities.Help"
+            android:label="@string/help"
             android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme"
-            android:label="@string/help" />
+            android:theme="@style/AppTheme" />
         <activity
-            android:name=".activities.VideoViewActivity"
-            android:screenOrientation="fullSensor"
+            android:name=".activities.VideoViewer"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/FullscreenTheme"
-           />
+            android:screenOrientation="fullSensor"
+            android:parentActivityName=".activities.MediaFileRecycleView"
+            android:theme="@style/FullscreenTheme" />
         <activity
             android:name=".activities.AudioPreview"
             android:label="@string/audio_preview_activity"
+            android:parentActivityName=".activities.MediaFileRecycleView"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="sk.fei.videoeditor.activities.MediaFileDetail" />
-        </activity>
+            android:theme="@style/AppTheme" />
         <activity
-            android:name=".activities.MediaFileDetail"
+            android:name=".activities.AudioFileRecycleView"
             android:label="@string/my_music"
+            android:parentActivityName=".activities.Camera"
+            android:resource="@xml/searchable"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activities.MediaFileRecycleView"
+            android:label="@string/app_name"
+            android:resource="@xml/searchable"
             android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:resource="@xml/searchable"
-                android:value="sk.fei.videoeditor.activities.MainActivity" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
-            android:name=".activities.AboutActivity"
+            android:name=".activities.About"
             android:label="@string/about"
             android:parentActivityName=".activities.MainActivity"
             android:screenOrientation="fullSensor">
@@ -77,30 +83,25 @@
                 android:value="sk.fei.videoeditor.activities.MainActivity" />
         </activity>
         <activity
-            android:name=".activities.CameraActivity"
+            android:name=".activities.Camera"
+            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.TrimActivity"
+            android:name=".activities.TrimVideo"
             android:icon="@mipmap/ic_pause"
             android:label="@string/title_activity_trim"
-            android:parentActivityName=".activities.MediaFileDetail"
+            android:parentActivityName=".activities.MediaFileRecycleView"
             android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".activities.VideoActivity"
+            android:name=".activities.VideoPreview"
             android:label="@string/title_activity_video"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.MainActivity"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

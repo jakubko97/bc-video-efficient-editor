@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:id="@+id/row_item_root">
+
+        <LinearLayout
+            android:background="#fff"
+            android:id="@+id/parent"
+            android:focusable="true"
+            android:clickable="true"
+            android:minHeight="?attr/actionBarSize"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize">
+
+            <View
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"/>
+
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/mediaIcon"
+                android:background="@android:color/transparent"
+                android:layout_width="50dp"
+                android:src="@mipmap/audio"
+                android:layout_height="50dp" />
+
+            <View
+                android:layout_width="15dp"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/mediaTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:text=""
+                android:textSize="15sp"
+                android:textColor="@color/primaryDarkColor"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+
+            <View
+                android:layout_width="15dp"
+                android:layout_height="wrap_content"/>
+
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/addAudio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                app:icon="@drawable/confirm_foreground"
+                app:iconTint="@color/primaryTextColor"
+                app:rippleColor="@color/primaryTextColor"
+                android:textColor="@color/primaryTextColor"
+                app:backgroundTint="@color/primaryDarkColor"
+                android:visibility="gone"
+                android:text="ADD" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#f2f2f2"/>
+
+        <LinearLayout
+            android:visibility="gone"
+            android:background="#f7f7f7"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical"
+            android:focusable="true"
+            android:id="@+id/layoutExpand"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_width="15dp"
+                android:layout_height="wrap_content"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mediaPlay"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/audio_play_foreground"
+                android:contentDescription="@string/play"
+                 />
+
+            <View
+                android:layout_width="15dp"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/currentPositionAudio"
+                android:layout_width="wrap_content"
+                android:text="@string/start_time_value_2"
+                android:layout_height="wrap_content" />
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/audioSeekBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="12dp"
+                />
+
+            <TextView
+                android:id="@+id/durationAudio"
+                android:layout_width="wrap_content"
+                android:text="@string/start_time_value_2"
+                android:gravity="end"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>

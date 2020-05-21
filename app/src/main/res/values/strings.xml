@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Video Editor</string>
+    <string name="app_name">My Video Editor</string>
     <string name="title_activity_video">Video preview</string>
     <string name="title_activity_trim">Trim Video</string>
     <string name="about">About</string>
@@ -10,8 +10,6 @@
     <string name="my_created_videos">My Created Videos</string>
     <string name="help">Help</string>
     <string name="video_preview">Video Preview</string>
-
-    <string name="title_activity_detail_video">DetailVideoActivity</string>
     <string name="video_button">Video Record Button</string>
     <string name="camera_button">Camera Capture Button</string>
     <string name="flip_facing_camera">Flip Facing Camera</string>
@@ -35,20 +33,53 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="start_time_value">00:00:000</string>
     <string name="image_audio_preview">Image Audio Preview</string>
-    <string name="default_title">default title</string>
+    <string name="default_title">Default Title</string>
     <string name="start_time_value_2">00.00</string>
-    <string name="cancel">cancel</string>
-    <string name="confirm">confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
     <string name="no_items">No Items</string>
     <string name="no_video_created">No Video Created</string>
     <string name="search">Search</string>
-    <string name="save">save</string>
+    <string name="save">Save</string>
     <string name="thumbnail">Thumbnail</string>
     <string name="my_video_editor">My Video Editor</string>
-    <string name="created_by_jj">created by Jakub Jančík</string>
-    <string name="app_icon">Application icon</string>
+    <string name="created_by_jj">Created by Jakub Jančík</string>
+    <string name="app_icon">Application Icon</string>
     <string name="audio_image">Audio Image</string>
-    <string name="select_audio">Select audio</string>
-    <string name="select_video">Select video</string>
-    <string name="record_video">Record video</string>
+    <string name="select_audio">Select Audio</string>
+    <string name="select_video">Select Video</string>
+    <string name="record_video">Record Video</string>
+    <string name="delete">Delete</string>
+    <string name="other">Other</string>
+    <string name="preview">Preview</string>
+    <string name="submit">Submit</string>
+    <string name="play">Play</string>
+    <string name="select_from_gallery">Select from gallery</string>
+    <string name="audio_is_selected">Audio is selected.</string>
+    <string name="audio_selected">Audio Selected</string>
+    <string name="retake">retake</string>
+
+    <plurals name="numberOfSongsAvailable">
+        <!--
+             As a developer, you should always supply "one" and "other"
+             strings. Your translators will know which strings are actually
+             needed for their language. Always include %d in "one" because
+             translators will need to use %d for languages where "one"
+             doesn't mean 1 (as explained above).
+          -->
+        <item quantity="one">%d file found</item>
+        <item quantity="other">%d files found</item>
+    </plurals>
+
+    <plurals name="numberOfSelectedFile">
+        <!--
+             As a developer, you should always supply "one" and "other"
+             strings. Your translators will know which strings are actually
+             needed for their language. Always include %d in "one" because
+             translators will need to use %d for languages where "one"
+             doesn't mean 1 (as explained above).
+          -->
+        <item quantity="one">%d file selected</item>
+        <item quantity="other">%d files selected</item>
+    </plurals>
 </resources>

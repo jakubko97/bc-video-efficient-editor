@@ -41,7 +41,6 @@
             android:layout_marginEnd="10dp"
             android:singleLine="true"
             android:textColor="@color/primaryTextColor"
-            android:text="@string/start_time_value"
             android:textSize="18sp"
             android:textStyle="bold" />
 

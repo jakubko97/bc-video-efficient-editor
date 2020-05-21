@@ -1,4 +1,4 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="fab_margin2">550dp</dimen>
+    <dimen name="fab_margin2">32dp</dimen>
 </resources>

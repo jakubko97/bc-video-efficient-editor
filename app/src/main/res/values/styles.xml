@@ -16,6 +16,32 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
+    <style name="AppTheme.Inbox" parent="AppTheme">
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorAccent">@color/primary_accent</item>
+        <item name="colorOnSecondary">@color/material_white_1000</item>
+    </style>
+
+    <style name="AppTheme.Purple" parent="AppTheme">
+        <item name="colorPrimary">@color/material_purple_500</item>
+        <item name="colorPrimaryDark">@color/material_purple_700</item>
+        <item name="colorAccent">@color/material_purple_a700</item>
+        <item name="colorOnSecondary">@color/material_purple_100</item>
+        <item name="colorControlHighlight">@color/material_purple_200</item>
+    </style>
+
+    <!-- Action Mode -->
+    <style name="ActionMode" parent="Widget.AppCompat.ActionMode">
+        <item name="background">@android:color/white</item>
+        <item name="titleTextStyle">@style/TitleTextStyle</item>
+    </style>
+
+    <!-- Title text of Contextual action bar-->
+    <style name="TitleTextStyle">
+        <item name="android:textColor">@color/primaryDarkColor</item>
+        <item name="android:textSize">18sp</item>
+    </style>
 
     <style name="FullscreenTheme" parent="AppTheme">
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>

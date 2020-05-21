@@ -2,23 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/homeButton"
-        android:icon="@mipmap/home_round"
-        android:title=""
-        app:showAsAction="ifRoom">
-    </item>
+<!--    <item-->
+<!--        android:id="@+id/homeButton"-->
+<!--        android:icon="@drawable/home_foreground"-->
+<!--        android:title=""-->
+<!--        app:showAsAction="ifRoom">-->
+<!--    </item>-->
 
     <item
         android:id="@+id/btnShare"
-        android:icon="@mipmap/share_round"
+        android:icon="@drawable/share_foreground"
         android:title=""
         app:showAsAction="ifRoom">
     </item>
 
     <item
         android:id="@+id/delete"
-        android:icon="@mipmap/delete_round"
+        android:icon="@drawable/delete_foreground"
         android:title=""
         app:showAsAction="ifRoom"
         >

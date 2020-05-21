@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:paddingTop="2dp"
     android:paddingBottom="2dp"
+    android:id="@+id/row_item_root"
     >
 <RelativeLayout
     android:layout_width="match_parent"
@@ -45,9 +46,31 @@
         android:paddingStart="10dp"
         android:layout_toEndOf="@+id/mediaIcon"
         android:layout_below="@id/mediaTitle"
-        tools:ignore="RtlSymmetry,SmallSp">
+        tools:ignore="RtlSymmetry,SmallSp"/>
 
-    </TextView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mediaSize"
+        android:textSize="11sp"
+        android:layout_marginEnd="12dp"
+        android:textColor="@color/colorLightBlack"
+        android:paddingStart="10dp"
+        android:layout_below="@id/mediaTitle"
+        android:layout_centerHorizontal="true"
+        tools:ignore="RtlSymmetry,SmallSp"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mediaDateCreated"
+        android:textSize="11sp"
+        android:layout_marginEnd="20dp"
+        android:textColor="@color/colorLightBlack"
+        android:paddingStart="10dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/mediaTitle"
+        tools:ignore="RtlSymmetry,SmallSp"/>
 </RelativeLayout>
+
 </LinearLayout>

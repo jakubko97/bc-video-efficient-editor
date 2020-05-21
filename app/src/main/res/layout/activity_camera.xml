@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.otaliastudios.cameraview.CameraView
+        android:id="@+id/camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:keepScreenOn="true"
+        app:cameraAudio="on"
+        app:cameraEngine="camera1"
+        app:cameraFacing="front"
+        app:cameraFlash="off"
+        app:cameraGestureLongTap="none"
+        app:cameraGesturePinch="none"
+        app:cameraGestureScrollHorizontal="none"
+        app:cameraGestureScrollVertical="none"
+        app:cameraGestureTap="autoFocus"
+        app:cameraGrid="off"
+        app:cameraHdr="off"
+        app:cameraMode="video"
+        app:cameraPlaySounds="true"
+        app:cameraPreview="glSurface"
+        app:cameraUseDeviceOrientation="true"
+        app:cameraVideoCodec="deviceDefault"
+        app:cameraVideoSizeMaxHeight="1200"
+        app:cameraVideoSizeMaxWidth="800"
+        app:cameraWhiteBalance="auto" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/close_cam"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_close_white_24dp"
+        app:fabSize="auto"
+        android:alpha="0.5"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="7dp"
+        app:fabCustomSize="40dp"
+        app:iconTint="@color/primaryTextColor"
+        app:backgroundTint="@color/material_gray_300"
+        app:maxImageSize="40dp"
+        app:iconSize="40dp"
+        android:clickable="true"
+        app:elevation="8dp"
+        app:backgroundTintMode="src_over"
+        android:tint="@color/primaryTextColor"
+        android:focusable="true" />
+
+    <Chronometer
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/chronometer"
+        android:visibility="invisible"
+        android:textColor="#ff0000"
+        android:textSize="25sp"
+        android:layout_marginTop="8dp"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/selectAudio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:layout_above="@+id/gridCamera"
+        android:layout_centerHorizontal="true"
+        app:icon="@drawable/music_note_foreground"
+        app:iconSize="40dp"
+        app:cornerRadius="56dp"
+        android:alpha="0.4"
+        app:iconTint="@color/primaryTextColor"
+        android:textColor="@color/primaryTextColor"
+        app:backgroundTint="@color/material_gray_600"
+        android:elevation="8dp"
+        android:text="@string/select_audio" />
+
+    <GridLayout
+        android:id="@+id/gridCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:rowCount="1"
+        android:columnCount="3"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        >
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/flash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_flash_on_white_24dp"
+            android:outlineSpotShadowColor="@color/colorGrey"
+            app:fabSize="normal"
+            android:alpha="0.5"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="7dp"
+            app:fabCustomSize="40dp"
+            app:backgroundTint="@color/material_gray_300"
+            app:maxImageSize="40dp"
+            app:iconSize="40dp"
+            android:clickable="true"
+            app:elevation="8dp"
+            app:backgroundTintMode="src_over"
+            android:focusable="true" />
+
+
+        <ImageButton
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:id="@+id/videoOnlineImageButton"
+            android:background="@drawable/btn_video_online_foreground"
+             />
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/flip_facing_camera"
+            android:src="@drawable/ic_flip_camera_white_24dp"
+            android:outlineSpotShadowColor="@color/colorGrey"
+            app:fabSize="normal"
+            android:alpha="0.5"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="7dp"
+            app:fabCustomSize="40dp"
+            app:backgroundTint="@color/material_gray_300"
+            app:maxImageSize="40dp"
+            app:iconSize="40dp"
+            android:clickable="true"
+            app:elevation="8dp"
+            app:backgroundTintMode="src_over"
+            android:focusable="true" />
+
+    </GridLayout>
+
+</RelativeLayout>

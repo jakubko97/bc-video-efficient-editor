@@ -1,6 +1,8 @@
 package sk.fei.videoeditor.activities;
+import android.Manifest;
 import android.content.Intent;
 
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,6 +11,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import sk.fei.videoeditor.R;
 
@@ -19,6 +23,12 @@ public class MainActivity extends AppCompatActivity {
     private CardView openVideo, captureVideo, setAudio, about, myVideos, help;
     String audioPath;
     boolean doubleBackToExitPressedOnce = false;
+    private final int REQUEST_READ_EXTERNAL_STORAGE_CREATED_VIDEOS = 100;
+    private final int REQUEST_READ_EXTERNAL_STORAGE_AUDIO = 101;
+    private final int REQUEST_READ_EXTERNAL_STORAGE_VIDEOS = 102;
+    private final int REQUEST_CAMERA = 103;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +55,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         openVideo.setOnClickListener(v -> {
-            if(audioPath != null) {
-                openVideo();
-            }else{
-                Toast.makeText(MainActivity.this, "Please Select Audio.", Toast.LENGTH_SHORT).show();
 
-            }
+                openVideo();
+
         });
 
 
@@ -59,11 +66,9 @@ public class MainActivity extends AppCompatActivity {
         myVideos.setOnClickListener(v -> openMyVideos());
 
         captureVideo.setOnClickListener(v -> {
-            if(audioPath != null) {
+
                 captureVideo();
-            }else{
-                Toast.makeText(MainActivity.this, "Please Select Audio.", Toast.LENGTH_SHORT).show();
-            }
+
         });
 
         setAudio.setOnClickListener(v -> setAudio(v));
@@ -76,39 +81,42 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+
+
     private void openMyVideos() {
-        Intent i = new Intent(MainActivity.this, MediaFileDetail.class);
-        i.putExtra("mode","myVideos");
-        startActivity(i);
+            Intent i = new Intent(MainActivity.this, MediaFileRecycleView.class);
+            i.putExtra("mode","myVideos");
+            startActivity(i);
+
     }
 
     private void openAbout() {
-        Intent i = new Intent(MainActivity.this,AboutActivity.class);
+        Intent i = new Intent(MainActivity.this, About.class);
         startActivity(i);
     }
 
 
     private void captureVideo() {
-
-        Intent i = new Intent(MainActivity.this,CameraActivity.class);
-        i.putExtra("audioUri",selectedAudio.toString());
-        i.putExtra("mode","withAudio");
-        startActivity(i);
-
+            // Permission has already been granted
+            Intent i = new Intent(MainActivity.this, Camera.class);
+            i.putExtra("audioUri",selectedAudio.toString());
+            i.putExtra("mode","withAudio");
+            startActivity(i);
     }
 
     private void openVideo(){
 
-        Intent i = new Intent(MainActivity.this, MediaFileDetail.class);
-        i.putExtra("mode","video");
-        i.putExtra("audioUri",selectedAudio.toString());
-        startActivity(i);
+            // Permission has already been granted
+            Intent i = new Intent(MainActivity.this, MediaFileRecycleView.class);
+            i.putExtra("mode","video");
+            i.putExtra("audioUri",selectedAudio.toString());
+            startActivity(i);
 
     }
 
     private void setAudio(View v){
 
-        Intent i = new Intent(MainActivity.this, MediaFileDetail.class);
+        Intent i = new Intent(MainActivity.this, MediaFileRecycleView.class);
         i.putExtra("mode","audio");
         startActivity(i);
 
@@ -126,4 +134,5 @@ public class MainActivity extends AppCompatActivity {
 
         new Handler().postDelayed(() -> doubleBackToExitPressedOnce=false, 2000);
     }
+
 }

@@ -1,5 +1,6 @@
 package sk.fei.videoeditor.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -16,7 +18,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import sk.fei.videoeditor.R;
 
@@ -24,7 +25,7 @@ public class AudioPreview extends AppCompatActivity {
 
     MediaPlayer mediaPlayer = new MediaPlayer();
     SeekBar seekBar;
-    private Button play,confirm,storno;
+    private Button play,confirm, cancel;
     int position;
     String audioPath;
     File audioFile;
@@ -44,7 +45,7 @@ public class AudioPreview extends AppCompatActivity {
         play = findViewById(R.id.play);
         audioName = findViewById(R.id.audioName);
         confirm = findViewById(R.id.confirmAudio);
-        storno = findViewById(R.id.stornoAudio);
+        cancel = findViewById(R.id.stornoAudio);
         currentPosition = findViewById(R.id.currentPositionAudio);
         duration = findViewById(R.id.durationAudio);
         handler = new Handler();
@@ -93,7 +94,7 @@ public class AudioPreview extends AppCompatActivity {
             }
         });
 
-        storno.setOnClickListener(new View.OnClickListener() {
+        cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
@@ -122,22 +123,35 @@ public class AudioPreview extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if(item.getItemId() == R.id.home){
+            Intent intent = new Intent(this, MediaFileRecycleView.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP); // Removes other Activities from stack
+            intent.putExtra("mode","audio");
+            startActivity(intent);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void changeSeekBar() {
         if(mediaPlayer != null){
-        seekBar.setProgress(mediaPlayer.getCurrentPosition());
-        currentPosition.setText(getTime(mediaPlayer.getCurrentPosition()));
+            seekBar.setProgress(mediaPlayer.getCurrentPosition());
+            currentPosition.setText(getTime(mediaPlayer.getCurrentPosition()));
 
-        if(mediaPlayer.isPlaying()){
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                changeSeekBar();
+            if(mediaPlayer.isPlaying()){
+                runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        changeSeekBar();
+                    }
+                };
+                handler.postDelayed(runnable,1000);
+            }else{
+                play.setBackgroundResource(R.drawable.play_foreground);
             }
-        };
-        handler.postDelayed(runnable,1000);
-        }else{
-            play.setBackgroundResource(R.drawable.play_foreground);
-        }
         }
     }
 
