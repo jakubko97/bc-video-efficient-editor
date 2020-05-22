@@ -26,9 +26,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +42,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.shape.MaterialShapeUtils;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 
@@ -102,6 +106,7 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
     }
 
 
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -141,16 +146,29 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
         super.onResume();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void initViews(){
 
         noItems = findViewById(R.id.noItems);
         noItemsText = findViewById(R.id.noItemsText);
+        mSwipeRefreshLayout = findViewById(R.id.swipeRefresh);
         recyclerView = findViewById(R.id.audioList);
+
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+            }
+        });
+
 //        showActionFab = (FloatingActionButton) findViewById(R.id.fab);
 //        recordVideoFab = (FloatingActionButton) findViewById(R.id.fab1);
 //        galleryFab = (FloatingActionButton) findViewById(R.id.fab2);
 
         speedDialView = findViewById(R.id.speedDial);
+        MaterialShapeUtils.setParentAbsoluteElevation(speedDialView);
         //speedDialView.inflate(R.menu.search_menu);
 
 //        Animations.init(recordVideoFab);
@@ -173,25 +191,25 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
 
         speedDialView.addActionItem(
                 new SpeedDialActionItem.Builder(R.id.recordVideo, R.drawable.ic_videocam_white_24dp)
-                        .setFabBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.primaryColor, getTheme()))
-                        .setFabImageTintColor(ResourcesCompat.getColor(getResources(), R.color.white, getTheme()))
+//                        .setFabBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.primary_accent, getTheme()))
+//                        .setFabImageTintColor(ResourcesCompat.getColor(getResources(), R.color.white, getTheme()))
                         .setLabel(getString(R.string.record_video))
                         .setLabelColor(getResources().getColor(R.color.material_gray_800))
                         .setLabelBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.white, getTheme()))
                         .setLabelClickable(true)
-                        .setTheme(R.style.AppTheme_Purple)
+//                        .setTheme(R.style.AppTheme_Purple)
                         .create()
         );
 
         speedDialView.addActionItem(
                 new SpeedDialActionItem.Builder(R.id.openVideo, R.drawable.ic_video_library_white_24dp)
-                        .setFabBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.primaryColor, getTheme()))
-                        .setFabImageTintColor(ResourcesCompat.getColor(getResources(), R.color.white, getTheme()))
+//                        .setFabBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.primary_accent, getTheme()))
+//                        .setFabImageTintColor(ResourcesCompat.getColor(getResources(), R.color.white, getTheme()))
                         .setLabelColor(getResources().getColor(R.color.material_gray_800))
                         .setLabel(getString(R.string.select_from_gallery))
                         .setLabelBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.white, getTheme()))
                         .setLabelClickable(true)
-                        .setTheme(R.style.AppTheme_Purple)
+//                        .setTheme(R.style.AppTheme_Purple)
                         .create());
 
         speedDialView.setOnActionSelectedListener(new SpeedDialView.OnActionSelectedListener() {
@@ -210,9 +228,9 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
             }
         });
 
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) speedDialView.getLayoutParams();
-        params.setBehavior(new SpeedDialView.ScrollingViewSnackbarBehavior());
-        speedDialView.requestLayout();
+//        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) speedDialView.getLayoutParams();
+//        params.setBehavior(new SpeedDialView.ScrollingViewSnackbarBehavior());
+//        speedDialView.requestLayout();
 
 //        showActionFab.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -261,7 +279,7 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
         else{
 
             List<RowItem> rowItems = new ArrayList<>();
-            mSwipeRefreshLayout = findViewById(R.id.swipeRefresh);
+
             mSwipeRefreshLayout.setColorSchemeResources(R.color.primary_accent);
 
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -275,6 +293,7 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
             String fileType = ".mp4";
             rowItems = FetchFiles.getFiles(root,fileType);
 
+
             Log.d("jakubko",  "velkost rowItems: "+ rowItems.size());
             if(!rowItems.isEmpty()){
                 recyclerView.setVisibility(View.VISIBLE);
@@ -282,10 +301,10 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
                 noItemsText.setVisibility(View.GONE);
 
                 itemLayout = R.layout.audio;
-                adapter = new VideoRecycleViewAdapter(this, itemLayout,rowItems,this);
+                adapter = new VideoRecycleViewAdapter(this, itemLayout,rowItems,this,true);
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
             recyclerView.setHasFixedSize(true);
             // Removes blinks
             ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
@@ -300,6 +319,8 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
             }
         }
     }
+
+
 
 
     @Override

@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -105,7 +105,7 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.video_preview, menu);
+        inflater.inflate(R.menu.video_view, menu);
         return true;
     }
 
@@ -143,22 +143,28 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
 
             alert.setMessage("The video file will be deleted.");
             alert.setView(linearLayout);
-            alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            alert.setNegativeButton("STORNO", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                 }
             });
 
-            alert.setPositiveButton("CONFIRM", new DialogInterface.OnClickListener() {
+            alert.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if(videoFile.exists()){
-                        videoFile.delete();
-                        dialog.dismiss();
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Removes other Activities from stack
-                        startActivity(intent);
+                        if(videoFile.delete()){
+                            Toast.makeText(VideoViewer.this,"Video has been deleted succesfully.",Toast.LENGTH_LONG).show();
+
+                            dialog.dismiss();
+                            Intent intent = new Intent(getApplicationContext(), MediaFileRecycleView.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Removes other Activities from stack
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(VideoViewer.this,"Some problem with deleting video.",Toast.LENGTH_LONG).show();
+                        }
+
                     }
                 }
             });
@@ -167,6 +173,11 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     @Override
@@ -242,7 +253,7 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
             Log.i("DEBUG"," haveResumePosition ");
             player.seekTo(mResumeWindow, mResumePosition);
         }
-        //String contentUrl = getString(R.string.video_preview);
+        //String contentUrl = getString(R.string.video_view);
         mVideoSource = buildMediaSource(Uri.parse(videoFile.getAbsolutePath()));
         Log.i("DEBUG"," mVideoSource "+mVideoSource);
         player.prepare(mVideoSource);

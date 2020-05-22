@@ -40,7 +40,7 @@ public class AudioPreview extends AppCompatActivity {
         setContentView(R.layout.activity_audio_preview);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_left_to_right);
+        //Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_left_to_right);
 
         play = findViewById(R.id.play);
         audioName = findViewById(R.id.audioName);

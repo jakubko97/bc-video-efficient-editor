@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-            android:id="@+id/exoplayer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+        android:id="@+id/exoplayer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 <!--                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton-->
 <!--                    android:id="@+id/retake"-->
@@ -45,32 +43,6 @@
 <!--                    android:elevation="10dp"-->
 <!--                    android:text="@string/save" />-->
 
-                <ImageButton
-                    android:id="@+id/retake"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="20dp"
-                    android:background="@color/transparent"
-                    android:layout_gravity="top|start"
-                    android:src="@drawable/ic_chevron_left_white_24dp"
-                    android:alpha="0.85"
-                    android:textColor="@color/primaryTextColor"
-                    android:elevation="8dp"
-                    android:contentDescription="@string/retake" />
 
-                <ImageButton
-                    android:id="@+id/save"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="20dp"
-                    android:background="@color/transparent"
-                    android:layout_gravity="top|right"
-                    android:src="@drawable/ic_file_download_white_24dp"
-                    android:alpha="0.85"
-                    android:textColor="@color/primaryTextColor"
-                    android:elevation="8dp"
-                    android:contentDescription="@string/save" />
 
-        </com.google.android.exoplayer2.ui.SimpleExoPlayerView>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

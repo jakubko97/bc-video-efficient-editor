@@ -155,6 +155,7 @@ public class Camera extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 openAudio(v);
+                selectAudioFab.setClickable(false);
             }
         });
 
@@ -242,7 +243,6 @@ public class Camera extends AppCompatActivity {
         Intent i = new Intent(this, AudioFileRecycleView.class);
         //i.putExtra("mode","audio");
         startActivityForResult(i,REQUEST_AUDIO);
-
     }
 
     @Override
@@ -256,6 +256,7 @@ public class Camera extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        selectAudioFab.setClickable(true);
         if(audioUri != null) {
             initializePlayer();
             animateTextView();

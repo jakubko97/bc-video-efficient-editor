@@ -4,6 +4,7 @@
 
     <item
         android:id="@+id/trim"
+        android:icon="@drawable/ic_done_white_24dp"
         android:title="@string/preview"
         app:showAsAction="always">
     </item>

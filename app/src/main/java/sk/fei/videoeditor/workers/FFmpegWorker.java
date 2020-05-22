@@ -1,12 +1,13 @@
 package sk.fei.videoeditor.workers;
-import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.PathDashPathEffect;
-import android.os.Environment;
+import android.media.AudioAttributes;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -19,9 +20,6 @@ import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,6 +35,7 @@ public class FFmpegWorker extends Worker {
     private String[] command;
     private String path;
     private int id;
+    private String channelID;
 
     private final static AtomicInteger c = new AtomicInteger(0);
     private NotificationManager mNotifyManager;
@@ -51,6 +50,7 @@ public class FFmpegWorker extends Worker {
     public Result doWork() {
 
         id = getID();
+        channelID = UUID.randomUUID().toString();
 
         duration = getInputData().getInt("duration",duration);
         command = getInputData().getStringArray("command");
@@ -121,7 +121,7 @@ public class FFmpegWorker extends Worker {
             @Override
             public void onStart() {
                 super.onStart();
-                    showNotification();
+                    createNotification();
 
                 Log.d("jakubko","Cut started");
             }
@@ -187,30 +187,52 @@ public class FFmpegWorker extends Worker {
         }
 
 
-    private void showNotification(){
+    private void createNotification(){
+
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         mNotifyManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-        mBuilder = new NotificationCompat.Builder(getApplicationContext());
-        mBuilder.setContentTitle("Video file in process")
-                .setContentText("Downloading")
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setOngoing(false)
-                .setCategory(NotificationCompat.CATEGORY_PROGRESS)
-                .setAutoCancel(true)
-                .setSmallIcon(android.R.drawable.stat_sys_download);
 
-        mNotifyManager.notify(id, mBuilder.build());
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            mBuilder = new NotificationCompat.Builder(getApplicationContext(), channelID);
+            mBuilder.setContentTitle("Merging audio and video")
+                    .setContentText("Downloading")
+                    .setPriority(Notification.PRIORITY_LOW)
+                    .setOngoing(false)
+                    .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+                    .setAutoCancel(true)
+                    .setChannelId(channelID)
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                    .setSmallIcon(android.R.drawable.stat_sys_download);
 
+            mNotifyManager.notify(id, mBuilder.build());
+
+            AudioAttributes attr = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build();
+            NotificationChannel channel = new NotificationChannel(channelID, "Download video", NotificationManager.IMPORTANCE_HIGH);
+            channel.setSound(soundUri,attr);
+            assert mNotifyManager != null;
+            mBuilder.setChannelId(channelID);
+            mNotifyManager.createNotificationChannel(channel);
+        }
+        else {
+            mBuilder = new NotificationCompat.Builder(getApplicationContext());
+            mBuilder.setContentTitle("Merging audio and video")
+                    .setContentText("Downloading...")
+                    .setPriority(Notification.PRIORITY_LOW)
+                    .setOngoing(false)
+                    .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+                    .setAutoCancel(true)
+                    .setSound(soundUri)
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                    .setSmallIcon(android.R.drawable.stat_sys_download);
+
+            mNotifyManager.notify(id, mBuilder.build());
+        }
         // Start a lengthy operation in a background thread
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
 
-                    }
-                }
-// Starts the thread by calling the run() method in its Runnable
-        ).start();
     }
-
 
 }

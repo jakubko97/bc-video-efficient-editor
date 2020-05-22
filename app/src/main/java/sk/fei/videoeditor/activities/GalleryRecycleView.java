@@ -25,6 +25,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
@@ -34,10 +35,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import sk.fei.videoeditor.R;
 import sk.fei.videoeditor.adapters.VideoRecycleViewAdapter;
+import sk.fei.videoeditor.beans.Directory;
 import sk.fei.videoeditor.beans.RowItem;
 import sk.fei.videoeditor.fetch.FetchFiles;
 
@@ -93,11 +97,11 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
 
             if(!rowItems.isEmpty()){
 
-                itemLayout = R.layout.audio;
-                adapter = new VideoRecycleViewAdapter(this, itemLayout,rowItems,this);
+                itemLayout = R.layout.gallery_view;
+                adapter = new VideoRecycleViewAdapter(this, itemLayout,rowItems,this,false);
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-                recyclerView.setItemAnimator(new DefaultItemAnimator());
+                //recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
                 recyclerView.setHasFixedSize(true);
                 // Removes blinks
                 ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);

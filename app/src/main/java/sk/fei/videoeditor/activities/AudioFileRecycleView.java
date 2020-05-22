@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
@@ -114,7 +115,7 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
                 adapter = new AudioRecycleViewAdapter(this, itemLayout,rowItems,this);
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                recyclerView.setItemAnimator(new DefaultItemAnimator());
+                recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
                 recyclerView.setHasFixedSize(false);
                 // Removes blinks
                 ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
@@ -192,6 +193,7 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
         intent.putExtra("audioUri",rowItem.getFile().getAbsolutePath());
         setResult(REQUEST_AUDIO, intent);
         finish();
+
 //        switch (mode) {
 //            case "audio": {
 //                Intent i = new Intent(MediaFileRecycleView.this, AudioPreview.class);

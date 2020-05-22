@@ -10,17 +10,26 @@
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:foregroundTintMode="add"
         app:layout_anchorGravity="top" >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/audioList"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            android:elevation="11dp"/>
-
+            android:layout_marginTop="16dp"
+            android:elevation="11dp"
+            android:backgroundTintMode="src_in"/>
+        </RelativeLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <ImageView
         android:id="@+id/noItems"
         android:layout_width="150dp"
@@ -39,6 +48,7 @@
         android:text="@string/no_video_created"
         android:textSize="22sp"
         android:visibility="gone" />
+    </RelativeLayout>
 
     <com.leinardi.android.speeddial.SpeedDialOverlayLayout
         android:id="@+id/overlay"
@@ -56,7 +66,7 @@
         android:backgroundTintMode="src_over"
         app:layout_behavior="@string/speeddial_scrolling_view_snackbar_behavior"
         app:sdExpansionMode="top"
-        android:elevation="10dp"
+        android:elevation="11dp"
         app:sdMainFabAnimationRotateAngle="90"
         app:sdMainFabClosedIconColor="@color/white"
         app:sdMainFabClosedSrc="@drawable/ic_add_white_24dp"

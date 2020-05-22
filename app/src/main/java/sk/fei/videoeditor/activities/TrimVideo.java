@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.crystal.crystalrangeseekbar.interfaces.OnRangeSeekbarChangeListener;
@@ -40,6 +41,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +52,8 @@ import sk.fei.videoeditor.R;
 
 public class TrimVideo extends AppCompatActivity {
 
+    private static final int REQUEST_AUDIO_TRIM = 101;
+    private static final int REQUEST_AUDIO = 100;
     Uri uri;
     String TAG = "TrimVideo";
     private SimpleExoPlayerView playerView;
@@ -61,10 +65,10 @@ public class TrimVideo extends AppCompatActivity {
 
     int duration;
     String[] command;
-    File dest;
 
     Uri audioUri;
     CrystalRangeSeekbar rangeSeekBar;
+    ExtendedFloatingActionButton addAudio;
 
     int minValueChanged = 0;
     int maxValueChanged = 0;
@@ -96,8 +100,6 @@ public class TrimVideo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trim);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         initLayoutControls();
 
         Intent i = getIntent();
@@ -113,9 +115,21 @@ public class TrimVideo extends AppCompatActivity {
         textViewRight = findViewById(R.id.tvvRight);
         textViewCenter = findViewById(R.id.tvDuration);
         rangeSeekBar = findViewById(R.id.rangeSeekbar1);
+        addAudio = findViewById(R.id.addAudio);
 
         createVideoFolder();
         // set listener
+
+        addAudio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAudio(v);
+                //addAudio.setEnabled(false);
+                addAudio.setClickable(false);
+                addAudio.setAlpha(0.5f);
+            }
+        });
+
         rangeSeekBar.setOnRangeSeekbarChangeListener(new OnRangeSeekbarChangeListener() {
             @Override
             public void valueChanged(Number minValue, Number maxValue) {
@@ -142,6 +156,12 @@ public class TrimVideo extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void openAudio(View v){
+        Intent i = new Intent(this, AudioFileRecycleView.class);
+        //i.putExtra("mode","audio");
+        startActivityForResult(i,REQUEST_AUDIO_TRIM);
     }
 
     private void initMediaPlayer(){
@@ -176,9 +196,10 @@ public class TrimVideo extends AppCompatActivity {
 
         switch (item.getItemId()){
             case android.R.id.home:
-                onBackPressed();
+                finish();
                 break;
             case R.id.trim :
+                item.setEnabled(false);
                 try {
                     trimVideo(rangeSeekBar.getSelectedMinValue().intValue(),
                             rangeSeekBar.getSelectedMaxValue().intValue());
@@ -194,7 +215,7 @@ public class TrimVideo extends AppCompatActivity {
                 myintent.putExtra("audioUri", audioUri.toString());
                 myintent.putExtra("videoUri", uri.toString());
                 myintent.putExtra("mode", "trimmedVideo");
-                myintent.putExtra("destination", dest.getAbsolutePath());
+                myintent.putExtra("destination", mVideoFileName);
                 startActivity(myintent);
         }
         return super.onOptionsItemSelected(item);
@@ -204,13 +225,12 @@ public class TrimVideo extends AppCompatActivity {
 
         setStartMs(startMs);
         setEndMs(endMs);
-
-        dest = createVideoFileName();
+        createVideoFileName();
         duration = (endMs - startMs);
 
-        Log.d("jakubko", audioUri.getPath() +" ..... "+ uri.getPath() + "............."+ dest.getAbsolutePath());
+        Log.d("jakubko", audioUri.getPath() +" ..... "+ uri.getPath() + "............."+ mVideoFileName);
 
-        command = new String[]{"-i", audioUri.getPath(), "-ss", getTime(startMs), "-y", "-i", uri.getPath(),"-t",getTime(duration), "-r","25", "-c:v", "copy", "-c:a", "aac", "-shortest", dest.getAbsolutePath()};
+        command = new String[]{"-i", audioUri.getPath(), "-ss", getTime(startMs), "-y", "-i", uri.getPath(),"-t",getTime(duration), "-r","25", "-c:v", "copy", "-c:a", "aac", "-shortest", mVideoFileName};
         //command = new String[]{"-ss", getTime(startMs), "-y", "-i", uri.getPath(),"-to",getTime(endMs), "-i", audioUri.getPath(), "-r","30", "-c:v", "copy", "-c:a", "aac", "-shortest", dest.getAbsolutePath()};
         //command = new String[]{"-ss", "" + getTime(startMs), "-y", "-i", originalPath, "-t", "" + getTime(duration), "-c:v", "libx264", "-preset", "ultrafast", "-crf", "17", "-c:a", "copy", dest.getAbsolutePath()};
         //command = new String[]{"-ss", "" + getTime(startMs), "-y", "-i", originalPath, "-t", "" + getTime(duration), "-r" , "30", "-filter:v", "setpts=(1/3)*PTS", dest.getAbsolutePath()};
@@ -219,12 +239,17 @@ public class TrimVideo extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
         if(audioUri !=null){
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.menu, menu);
         }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
         return true;
     }
 
@@ -236,18 +261,29 @@ public class TrimVideo extends AppCompatActivity {
         }
     }
 
-    private File createVideoFileName() throws IOException {
+    private void createVideoFileName() {
         @SuppressLint("SimpleDateFormat") String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String prepend = "VIDEO_" + timestamp + "_";
-        File videoFile = File.createTempFile(prepend, ".mp4", mVideoFolder);
-        mVideoFileName = videoFile.getAbsolutePath();
-        return videoFile;
+        String fileExt = ".mp4";
+        File file = new File(mVideoFolder, prepend + fileExt);
+        mVideoFileName  = file.getAbsolutePath();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         createPlayers();
+        addAudio.setClickable(true);
+        addAudio.setAlpha(1.0f);
+        if(audioUri != null){
+        invalidateOptionsMenu();
+        updateFAB();
+        }
+    }
+
+    private void updateFAB() {
+        addAudio.setIcon(getDrawable(R.drawable.ic_mode_edit_white_24dp));
+        addAudio.setText("EDIT");
     }
 
     private ExoPlayer.EventListener eventListener = new ExoPlayer.EventListener() {
@@ -364,7 +400,9 @@ public class TrimVideo extends AppCompatActivity {
 
 
         player.addListener(eventListener);
-        //player.setVolume(0f);
+        if(audioUri != null){
+            player.setVolume(0f);
+        }
         player.setPlayWhenReady(true);
         player.prepare(videoSource);
 
@@ -375,7 +413,7 @@ public class TrimVideo extends AppCompatActivity {
     public void initRangeSeekBarValues(){
         //textViewLeft.setText(getTime((int) player.getCurrentPosition()));
         textViewRight.setText(getTime((int) player.getDuration()));
-        //textViewCenter.setText(getTime((int) player.getDuration()));
+        textViewCenter.setText(getTime((int) player.getDuration()));
 
         rangeSeekBar.setMaxValue((int) player.getDuration());
         rangeSeekBar.setMinValue(0);
@@ -383,6 +421,18 @@ public class TrimVideo extends AppCompatActivity {
 
         maxValueChanged = (int)player.getDuration();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode,
+                                    int resultCode,
+                                    Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == REQUEST_AUDIO_TRIM && resultCode == REQUEST_AUDIO) {
+            audioUri = Uri.parse(intent.getStringExtra("audioUri"));
+            //Toast.makeText(Camera.this,"Select audio before recording." + intent.getStringExtra("audioUri"),Toast.LENGTH_LONG).show();
+        }
+    }
+
 
 }
 

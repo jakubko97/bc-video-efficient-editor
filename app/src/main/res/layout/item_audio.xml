@@ -18,7 +18,7 @@
             android:layout_height="?attr/actionBarSize">
 
             <View
-                android:layout_width="10dp"
+                android:layout_width="5dp"
                 android:layout_height="wrap_content"/>
 
 
@@ -41,8 +41,8 @@
                 android:maxLines="2"
                 android:ellipsize="end"
                 android:text=""
-                android:textSize="15sp"
-                android:textColor="@color/primaryDarkColor"
+                android:textSize="13sp"
+                android:textColor="@color/material_gray_700"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
             <View
@@ -59,7 +59,6 @@
                 app:iconTint="@color/primaryTextColor"
                 app:rippleColor="@color/primaryTextColor"
                 android:textColor="@color/primaryTextColor"
-                app:backgroundTint="@color/primaryDarkColor"
                 android:visibility="gone"
                 android:text="ADD" />
 

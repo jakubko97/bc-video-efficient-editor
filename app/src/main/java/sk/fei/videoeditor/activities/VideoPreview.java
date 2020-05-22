@@ -2,8 +2,12 @@ package sk.fei.videoeditor.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -20,6 +24,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.work.Constraints;
 import androidx.work.Data;
@@ -93,7 +98,6 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
     Handler handler;
     PlayerControlView controls;
 
-    ImageButton save, retake;
     DefaultTimeBar timeBar;
     TextView exoCurrentPosition, exoDuration;
 
@@ -104,14 +108,13 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         setContentView(R.layout.activity_video);
 
-        createOutputFilePath();
         setDataFromIntent();
         setViewsLayout();
-
     }
 
     private String createOutputFilePath(){
@@ -121,7 +124,7 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
         }
 
         @SuppressLint("SimpleDateFormat") String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String prepend = "VIDEO_" + timestamp + "_";
+        String prepend = "CAMERA_" + timestamp + "_";
 
         String fileExt = ".mp4";
         dest = new File(folder, prepend + fileExt);
@@ -134,26 +137,6 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
         exoCurrentPosition = findViewById(R.id.exo_position);
         exoDuration = findViewById(R.id.exo_duration);
         controls = findViewById(R.id.exo_controller);
-        retake = findViewById(R.id.retake);
-        save = findViewById(R.id.save);
-
-        save.setEnabled(false);
-
-        retake.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setRetake();
-            }
-        });
-
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               if(createWorker()){
-                   save.setEnabled(false);
-               }
-            }
-        });
 
         dataSourceFactory =
                 new DefaultDataSourceFactory(
@@ -182,6 +165,8 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
                 .setRequiresStorageNotLow(true)
                 .setRequiresBatteryNotLow(true)
                 .build();
+
+        Log.d("videoPreview", "createWorker          ..............." );
 
         OneTimeWorkRequest mRequest = new OneTimeWorkRequest.Builder(FFmpegWorker.class)
                 .setInputData(createInputData(command,duration,dest.getPath()))
@@ -221,6 +206,7 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
 
             }
             else{
+                createOutputFilePath();
                 Log.d("jakubko", "mode: "+mode);
 
                 duration = videoResult.getMaxDuration();
@@ -292,17 +278,23 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
+        Drawable resIcon = getResources().getDrawable(R.drawable.ic_file_download_white_24dp);
+
         switch (item.getItemId()){
             case android.R.id.home:
-                onBackPressed();
+                finish();
                 break;
 
             case R.id.save :
-                item.setEnabled(false);
 
+                createWorker();
+                item.setEnabled(false);
+                resIcon.mutate().setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN);
+                item.setIcon(resIcon);
         }
 
         return super.onOptionsItemSelected(item);

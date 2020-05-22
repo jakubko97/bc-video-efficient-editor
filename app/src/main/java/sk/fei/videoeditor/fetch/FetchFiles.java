@@ -14,6 +14,7 @@ import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import sk.fei.videoeditor.beans.Directory;
 import sk.fei.videoeditor.beans.RowItem;
 
 public class FetchFiles {
@@ -39,7 +41,7 @@ public class FetchFiles {
             for (int i = 0; i < songs.size(); ++i) {
                 //files.add(songs.get(i));
                 songNames[i] = songs.get(i).getName().replace(fileType, "");
-                descriptions[i] = getTime(getMediaDuration(songs, i));
+                descriptions[i] = "";
                 dateCreated[i] = getDateCreated(i, songs);
 
                 RowItem item = new RowItem(songNames[i], descriptions[i], songs.get(i), dateCreated[i]);
@@ -71,6 +73,39 @@ public class FetchFiles {
     }
 
 
+    public static Directory walk(File root){
+
+        Directory dirs = new Directory();
+        dirs.setFile(root);
+        dirs.setName(root.getName());
+
+        if(root.isDirectory()){
+           File[] files = root.listFiles();
+
+//            File[] children = root.listFiles(new FileFilter() {
+//                public boolean accept(File file) {
+//                    return file.isDirectory() || file.getName().toLowerCase().endsWith(".mp4");
+//                }
+//            });
+
+            assert files != null;
+                for (File file : files) {
+
+                    if(!file.isDirectory() && !file.getName().endsWith(".mp4")){
+                    }else{
+                        dirs.getFiles().add(walk(file));
+                        if(file.getName().endsWith(".mp4")){
+                            dirs.setHasVideo(true);
+                        }
+                    }
+                 }
+        }
+       // Log.d("dir", "->"+ dirs.getName());
+
+        return dirs;
+    }
+
+
     private static ArrayList<File> readSongs(File root, String fileType){
 
 
@@ -80,8 +115,10 @@ public class FetchFiles {
         assert files != null;
         for (File file : files) {
             if (file.isDirectory()) {
+                //Log.d("dir", "."+ file.getName());
                 arrayList.addAll(readSongs(file, fileType));
             } else {
+                //Log.d("dir", "->"+ file.getName());
                 if (file.getName().endsWith(fileType)) {
                     arrayList.add(file);
                 }

@@ -24,6 +24,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,7 +34,9 @@ import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 
 import sk.fei.videoeditor.R;
 import sk.fei.videoeditor.beans.RowItem;
@@ -45,6 +48,7 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
     private List<RowItem> items;
     private List<RowItem> itemsFiltered;
     private RowItemsListener listener;
+    private boolean isActionMode;
     int itemLayoutId;
     ActionMode actionMode;
 
@@ -60,12 +64,13 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
     }
 
     public VideoRecycleViewAdapter (Context context, int itemLayoutId,
-                                     List<RowItem> items, RowItemsListener listener) {
+                                     List<RowItem> items, RowItemsListener listener, boolean isActionMode) {
         this.context = context;
         this.items = items;
         this.itemsFiltered = items;
         this.listener = listener;
         this.itemLayoutId = itemLayoutId;
+        this.isActionMode = isActionMode;
     }
 
     @Override
@@ -115,13 +120,21 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            if(itemLayoutId == R.layout.gallery_view){
+
+                txtTitle = itemView.findViewById(R.id.mediaTitle);
+                imageView = itemView.findViewById(R.id.mediaIcon);
+                linearLayout = itemView.findViewById(R.id.row_item_root);
+
+            } else if(itemLayoutId == R.layout.audio){
+
             txtTitle = itemView.findViewById(R.id.mediaTitle);
             txtDesc = itemView.findViewById(R.id.mediaDescription);
             imageView = itemView.findViewById(R.id.mediaIcon);
             txtDateCreated = itemView.findViewById(R.id.mediaDateCreated);
             linearLayout = itemView.findViewById(R.id.row_item_root);
             size = itemView.findViewById(R.id.mediaSize);
-
+            }
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -136,24 +149,29 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
         private void bind(RowItem rowItem) {
             // Get the state
             // Set the visibility based on state
+            if(itemLayoutId == R.layout.audio){
+                txtDesc.setText(rowItem.getDesc());
+                size.setText(rowItem.getSize());
+
+                SimpleDateFormat timeStampFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+                String dateStr = timeStampFormat.format(rowItem.getDateCreated());
+
+                dateStr = dateStr.replace("-", ".");
+
+                txtDateCreated.setText(dateStr);
+            }
 
             txtTitle.setText(rowItem.getTitle());
-            txtDesc.setText(rowItem.getDesc());
-            size.setText(rowItem.getSize());
 
-            SimpleDateFormat timeStampFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-            String dateStr = timeStampFormat.format(rowItem.getDateCreated());
-
-            dateStr = dateStr.replace("-", ".");
-
-            txtDateCreated.setText(dateStr);
 
                 Glide
                         .with(context)
-                        .asBitmap()
                         .load(rowItem.getFile())
                         .error(R.drawable.broken_image_foreground)
+                        .override(140,100)
+                        .transition(DrawableTransitionOptions.withCrossFade(750))
                         .into(imageView);
+
         }
 
         void selectItem(RowItem rowItem) {
@@ -183,7 +201,9 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
+                    if(isActionMode){
                     actionMode = ((AppCompatActivity)view.getContext()).startSupportActionMode(actionModeCallbacks);
+                    }
                     selectItem(rowItem);
                     return true;
                 }
@@ -249,8 +269,8 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
         // Return a new holder instance
         ViewHolder viewHolder = new ViewHolder(view);
 
-        String songsFound = context.getResources().getQuantityString(R.plurals.numberOfSongsAvailable, getItemCount(),getItemCount());
-        ((AppCompatActivity)viewHolder.itemView.getContext()).getSupportActionBar().setSubtitle(songsFound);
+//        String songsFound = context.getResources().getQuantityString(R.plurals.numberOfSongsAvailable, getItemCount(),getItemCount());
+//        ((AppCompatActivity)viewHolder.itemView.getContext()).getSupportActionBar().setSubtitle(songsFound);
 
         return viewHolder;
     }
@@ -267,8 +287,8 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
         Log.d("rowItem", "title = " +rowItem.getTitle());
         Log.d("rowItem", "item count  = " + getItemCount());
 
-        String songsFound = context.getResources().getQuantityString(R.plurals.numberOfSongsAvailable, getItemCount(),getItemCount());
-        ((AppCompatActivity)holder.itemView.getContext()).getSupportActionBar().setSubtitle(songsFound);
+//        String songsFound = context.getResources().getQuantityString(R.plurals.numberOfSongsAvailable, getItemCount(),getItemCount());
+//        ((AppCompatActivity)holder.itemView.getContext()).getSupportActionBar().setSubtitle(songsFound);
     }
 
     @Override
@@ -278,6 +298,19 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
 
     public interface RowItemsListener {
         void onRowItemSelected(RowItem rowItem);
+    }
+
+    private static ArrayList<File> listFile(File root){
+
+        ArrayList<File> arrayList = new ArrayList<>();
+        File[] files = root.listFiles();
+
+        assert files != null;
+        for (File file : files) {
+            arrayList.add(file);
+
+        }
+        return arrayList;
     }
 
 }

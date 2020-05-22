@@ -343,8 +343,8 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
         holder.bind(rowItem);
         holder.update(rowItem);
 
-        String songsFound = context.getResources().getQuantityString(R.plurals.numberOfSongsAvailable, getItemCount(),getItemCount());
-        ((AppCompatActivity)holder.itemView.getContext()).getSupportActionBar().setSubtitle(songsFound);
+//        String songsFound = context.getResources().getQuantityString(R.plurals.numberOfSongsAvailable, getItemCount(),getItemCount());
+//        ((AppCompatActivity)holder.itemView.getContext()).getSupportActionBar().setSubtitle(songsFound);
 
         // Set item views based on your views and data model
 

@@ -2,5 +2,6 @@
 <searchable
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:label="@string/my_created_videos"
+    android:icon="@drawable/ic_add_white_24dp"
     android:hint="Search video">
 </searchable>

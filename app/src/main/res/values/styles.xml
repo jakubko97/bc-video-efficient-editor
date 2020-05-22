@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
@@ -6,7 +6,6 @@
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorAccent">@color/primaryLightColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-<!--        <item name="colorAccent">@color/colorAccent</item>-->
     </style>
 
     <style name="Theme.MaterialComponents.Light.NoActionBar.FullScreen" parent="@style/Theme.MaterialComponents.Light.NoActionBar">
@@ -19,7 +18,7 @@
     <style name="AppTheme.Inbox" parent="AppTheme">
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-        <item name="colorAccent">@color/primary_accent</item>
+        <item name="colorAccent">#EF118C</item>
         <item name="colorOnSecondary">@color/material_white_1000</item>
     </style>
 
@@ -29,6 +28,7 @@
         <item name="colorAccent">@color/material_purple_a700</item>
         <item name="colorOnSecondary">@color/material_purple_100</item>
         <item name="colorControlHighlight">@color/material_purple_200</item>
+        <item name="android:textSize">12pt</item>
     </style>
 
     <!-- Action Mode -->
@@ -61,5 +61,26 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+
+    <!--Components-->
+
+    <!--Bottom Sheets-->
+    <style name="ThemeOverlay.MyTheme.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/Animation.MyTheme.BottomSheet.Modal</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomSheetStyle">@style/Widget.MyTheme.BottomSheet.Modal</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">@android:color/transparent</item>
+    </style>
+    <style name="Widget.MyTheme.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="shapeAppearanceOverlay">?attr/shapeAppearanceLargeComponent</item>
+    </style>
+
+    <!--Navigation Drawer-->
+    <style name="Widget.MyTheme.NavigationView" parent="Widget.MaterialComponents.NavigationView">
+        <item name="itemTextAppearance">?attr/textAppearanceBody2</item>
+    </style>
 
 </resources>

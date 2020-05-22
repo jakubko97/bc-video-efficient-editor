@@ -35,38 +35,42 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".activities.GalleryRecycleView"></activity>
+        android:theme="@style/Theme.MyApp">
+        <activity
+            android:name=".activities.GalleryRecycleView"
+            android:label="@string/gallery_recycle_view"
+            android:screenOrientation="fullSensor"
+            android:parentActivityName=".activities.MediaFileRecycleView"/>
         <activity
             android:name=".activities.Help"
             android:label="@string/help"
             android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme" />
+            />
         <activity
             android:name=".activities.VideoViewer"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="fullSensor"
             android:parentActivityName=".activities.MediaFileRecycleView"
-            android:theme="@style/FullscreenTheme" />
+            />
         <activity
             android:name=".activities.AudioPreview"
             android:label="@string/audio_preview_activity"
             android:parentActivityName=".activities.MediaFileRecycleView"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme" />
+             />
         <activity
             android:name=".activities.AudioFileRecycleView"
             android:label="@string/my_music"
             android:parentActivityName=".activities.Camera"
             android:resource="@xml/searchable"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme" />
+            />
         <activity
             android:name=".activities.MediaFileRecycleView"
             android:label="@string/app_name"
             android:resource="@xml/searchable"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme">
+           >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -85,23 +89,27 @@
         <activity
             android:name=".activities.Camera"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
+            />
         <activity
             android:name=".activities.TrimVideo"
             android:icon="@mipmap/ic_pause"
             android:label="@string/title_activity_trim"
-            android:parentActivityName=".activities.MediaFileRecycleView"
+            android:parentActivityName=".activities.GalleryRecycleView"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme" />
+            />
         <activity
             android:name=".activities.VideoPreview"
             android:label="@string/title_activity_video"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar" />
+             />
         <activity
             android:name=".activities.MainActivity"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar" />
+            />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

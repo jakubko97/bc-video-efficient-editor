@@ -58,6 +58,8 @@
     <string name="audio_is_selected">Audio is selected.</string>
     <string name="audio_selected">Audio Selected</string>
     <string name="retake">retake</string>
+    <string name="gallery_recycle_view">Gallery View</string>
+    <string name="Audio">audio</string>
 
     <plurals name="numberOfSongsAvailable">
         <!--
