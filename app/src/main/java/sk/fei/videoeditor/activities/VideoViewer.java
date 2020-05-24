@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -17,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,8 +33,10 @@ import com.google.android.exoplayer2.source.ads.AdsMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
@@ -40,6 +44,7 @@ import com.google.android.exoplayer2.util.Util;
 import java.io.File;
 import java.util.Objects;
 
+import sk.fei.videoeditor.BuildConfig;
 import sk.fei.videoeditor.R;
 
 public class VideoViewer extends AppCompatActivity implements AdsMediaSource.MediaSourceFactory {
@@ -49,15 +54,13 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
     File videoFile;
     private final String STATE_RESUME_WINDOW = "resumeWindow";
     private final String STATE_RESUME_POSITION = "resumePosition";
-    private final String STATE_PLAYER_FULLSCREEN = "playerFullscreen";
 
-    private PlayerView playerView;
+    private SimpleExoPlayerView playerView;
     private MediaSource mVideoSource;
-    private boolean mExoPlayerFullscreen = false;
-    private FrameLayout mFullScreenButton;
-    private ImageView mFullScreenIcon;
+
     private Dialog mFullScreenDialog;
     private  DataSource.Factory dataSourceFactory;
+    private ImageView close, share, delete;
 
     private SimpleExoPlayer player;
 
@@ -67,12 +70,12 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getSupportActionBar().hide();
+
         setContentView(R.layout.activity_video_view);
         onNewIntent(getIntent());
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Video");
-
 
         dataSourceFactory =
                 new DefaultDataSourceFactory(
@@ -81,7 +84,6 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
         if (savedInstanceState != null) {
             mResumeWindow = savedInstanceState.getInt(STATE_RESUME_WINDOW);
             mResumePosition = savedInstanceState.getLong(STATE_RESUME_POSITION);
-            mExoPlayerFullscreen = savedInstanceState.getBoolean(STATE_PLAYER_FULLSCREEN);
         }
     }
 
@@ -103,89 +105,10 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.video_view, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        if(item.getItemId() == R.id.home){
-//            Intent intent = new Intent(this, MediaFileRecycleView.class);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Removes other Activities from stack
-//            intent.putExtra("mode","myVideos");
-//            startActivity(intent);
-        }
-
-        if(item.getItemId() == R.id.btnShare){
-
-            Uri uriFromFile = Uri.fromFile(videoFile);
-            Log.d(TAG, "uri: "+ uriFromFile);
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_STREAM, uriFromFile); // for media share
-            sendIntent.setType("video/*");
-
-            Intent shareIntent = Intent.createChooser(sendIntent, null);
-            startActivity(shareIntent);
-        }
-
-        if (item.getItemId() == R.id.delete) {
-
-            final AlertDialog.Builder alert = new AlertDialog.Builder(VideoViewer.this);
-
-            LinearLayout linearLayout = new LinearLayout(VideoViewer.this);
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lp.setMargins(50, 0, 100, 0);
-
-            alert.setMessage("The video file will be deleted.");
-            alert.setView(linearLayout);
-            alert.setNegativeButton("STORNO", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-
-            alert.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if(videoFile.exists()){
-                        if(videoFile.delete()){
-                            Toast.makeText(VideoViewer.this,"Video has been deleted succesfully.",Toast.LENGTH_LONG).show();
-
-                            dialog.dismiss();
-                            Intent intent = new Intent(getApplicationContext(), MediaFileRecycleView.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Removes other Activities from stack
-                            startActivity(intent);
-                        }else{
-                            Toast.makeText(VideoViewer.this,"Some problem with deleting video.",Toast.LENGTH_LONG).show();
-                        }
-
-                    }
-                }
-            });
-
-            alert.show();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
 
         outState.putInt(STATE_RESUME_WINDOW, mResumeWindow);
         outState.putLong(STATE_RESUME_POSITION, mResumePosition);
-        outState.putBoolean(STATE_PLAYER_FULLSCREEN, mExoPlayerFullscreen);
 
         super.onSaveInstanceState(outState);
     }
@@ -195,11 +118,11 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
 
         mFullScreenDialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
             public void onBackPressed() {
-                if (mExoPlayerFullscreen)
-                    closeFullscreenDialog();
-                super.onBackPressed();
+                    mFullScreenDialog.dismiss();
+                    finish();
             }
         };
+
     }
 
 
@@ -207,45 +130,17 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         ((ViewGroup) playerView.getParent()).removeView(playerView);
         mFullScreenDialog.addContentView(playerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(VideoViewer.this, R.mipmap.ic_fullscreen_skrink_foreground));
-        mExoPlayerFullscreen = true;
+        //mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(VideoViewer.this, R.mipmap.ic_fullscreen_skrink_foreground));
         mFullScreenDialog.show();
 
     }
 
 
-    private void closeFullscreenDialog() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-        ((ViewGroup) playerView.getParent()).removeView(playerView);
-        ((FrameLayout) findViewById(R.id.main_media_frame)).addView(playerView);
-        mExoPlayerFullscreen = false;
-        mFullScreenDialog.dismiss();
-        mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(VideoViewer.this, R.mipmap.ic_fullscreen_expand_foreground));
-
-    }
-
-
-    private void initFullscreenButton() {
-
-        PlayerControlView controlView = playerView.findViewById(R.id.exo_controller);
-        mFullScreenIcon = controlView.findViewById(R.id.exo_fullscreen_icon);
-        mFullScreenButton = controlView.findViewById(R.id.exo_fullscreen_button);
-        mFullScreenButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mExoPlayerFullscreen)
-                    openFullscreenDialog();
-                else
-                    closeFullscreenDialog();
-            }
-        });
-
-    }
-
     private void initExoPlayer() {
 
         player = ExoPlayerFactory.newSimpleInstance(this);
         playerView.setPlayer(player);
+        playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
 
         boolean haveResumePosition = mResumeWindow != C.INDEX_UNSET;
 
@@ -261,6 +156,94 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
 
     }
 
+    private void shareVideo(){
+        Uri uriFromFile = FileProvider.getUriForFile(VideoViewer.this, BuildConfig.APPLICATION_ID + ".provider",videoFile);
+        //Uri uriFromFile = Uri.fromFile(videoFile);
+        Log.d(TAG, "uri: "+ uriFromFile);
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_STREAM, uriFromFile); // for media share
+        sendIntent.setType("video/*");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        startActivity(shareIntent);
+    }
+
+    private void initExoControlers(){
+        playerView =  findViewById(R.id.exoplayer);
+        playerView.findViewById(R.id.exo_save).setVisibility(View.GONE);
+
+        close = playerView.findViewById(R.id.exo_close);
+        share = playerView.findViewById(R.id.exo_share);
+        delete = playerView.findViewById(R.id.exo_delete);
+
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFullScreenDialog.dismiss();
+                finish();
+            }
+        });
+
+
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shareVideo();
+            }
+        });
+
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteVideo();
+            }
+        });
+
+
+    }
+
+    private void deleteVideo(){
+        final AlertDialog.Builder alert = new AlertDialog.Builder(VideoViewer.this);
+
+        LinearLayout linearLayout = new LinearLayout(VideoViewer.this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(50, 0, 100, 0);
+
+        alert.setMessage("The video file will be deleted.");
+        alert.setView(linearLayout);
+        alert.setNegativeButton("STORNO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        alert.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(videoFile.exists()){
+                    if(videoFile.delete()){
+                        mFullScreenDialog.dismiss();
+
+                        Toast.makeText(VideoViewer.this,"Video has been deleted succesfully.",Toast.LENGTH_LONG).show();
+
+                        dialog.dismiss();
+                        Intent intent = new Intent(getApplicationContext(), MediaFileRecycleView.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Removes other Activities from stack
+                        startActivity(intent);
+                    }else{
+                        Toast.makeText(VideoViewer.this,"Some problem with deleting video.",Toast.LENGTH_LONG).show();
+                    }
+
+                }
+            }
+        });
+
+        alert.show();
+    }
 
     @Override
     protected void onResume() {
@@ -268,20 +251,17 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
         super.onResume();
 
         if (playerView == null) {
-            playerView =  findViewById(R.id.exoplayer);
+            initExoControlers();
             initFullscreenDialog();
-            initFullscreenButton();
-
         }
-
         initExoPlayer();
+        openFullscreenDialog();
 
-        if (mExoPlayerFullscreen) {
             ((ViewGroup) playerView.getParent()).removeView(playerView);
             mFullScreenDialog.addContentView(playerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(VideoViewer.this, R.mipmap.ic_fullscreen_skrink_foreground));
+           // mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(VideoViewer.this, R.mipmap.ic_fullscreen_skrink_foreground));
             mFullScreenDialog.show();
-        }
+
     }
 
 
@@ -314,8 +294,7 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
             player.release();
         }
 
-        if (mFullScreenDialog != null)
-            mFullScreenDialog.dismiss();
+
     }
 
     @Override

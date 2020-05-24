@@ -49,7 +49,7 @@ public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.audio, null);
             holder = new ViewHolder();
-            holder.txtDesc = convertView.findViewById(R.id.mediaDescription);
+            //holder.txtDesc = convertView.findViewById(R.id.mediaDescription);
             holder.txtTitle = convertView.findViewById(R.id.mediaTitle);
             holder.imageView = convertView.findViewById(R.id.mediaIcon);
             convertView.setTag(holder);

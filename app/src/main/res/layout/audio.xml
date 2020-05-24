@@ -8,9 +8,11 @@
     android:paddingBottom="0dp"
     android:layout_marginVertical="4dp"
     android:id="@+id/row_item_root">
+
 <RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="15dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/parentIcon"
@@ -48,28 +50,30 @@
 
     </TextView>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/mediaDescription"
-        android:textSize="11sp"
-        android:layout_marginEnd="12dp"
-        android:textColor="@color/colorLightBlack"
-        android:paddingStart="10dp"
-        android:layout_toEndOf="@+id/parentIcon"
-        android:layout_below="@id/mediaTitle"
-        tools:ignore="RtlSymmetry,SmallSp"/>
+<!--    <TextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:id="@+id/mediaDescription"-->
+<!--        android:textSize="11sp"-->
+<!--        android:layout_marginEnd="12dp"-->
+<!--        android:textColor="@color/colorLightBlack"-->
+<!--        android:paddingStart="10dp"-->
+<!--        android:layout_toEndOf="@+id/parentIcon"-->
+<!--        android:layout_below="@id/mediaTitle"-->
+<!--        tools:ignore="RtlSymmetry,SmallSp"/>-->
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/mediaSize"
         android:textSize="11sp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginEnd="10dp"
         android:textColor="@color/colorLightBlack"
-        android:paddingStart="10dp"
-        android:layout_below="@id/mediaTitle"
-        android:layout_centerHorizontal="true"
+        android:paddingStart="8dp"
+        android:paddingVertical="3dp"
+        android:layout_toEndOf="@id/parentIcon"
+        android:layout_below="@id/mediaDateCreated"
+
         tools:ignore="RtlSymmetry,SmallSp"/>
 
     <TextView
@@ -77,10 +81,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/mediaDateCreated"
         android:textSize="11sp"
-        android:layout_marginEnd="30dp"
         android:textColor="@color/colorLightBlack"
-        android:paddingStart="10dp"
-        android:layout_alignParentEnd="true"
+        android:paddingStart="8dp"
+        android:paddingVertical="3dp"
+        android:layout_toEndOf="@id/parentIcon"
         android:layout_below="@+id/mediaTitle"
         tools:ignore="RtlSymmetry,SmallSp"/>
 </RelativeLayout>

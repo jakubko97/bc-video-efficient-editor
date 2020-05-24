@@ -5,44 +5,45 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import sk.fei.videoeditor.R;
 import sk.fei.videoeditor.adapters.AudioRecycleViewAdapter;
 import sk.fei.videoeditor.beans.RowItem;
+import sk.fei.videoeditor.dialogs.About;
 import sk.fei.videoeditor.fetch.FetchFiles;
+import sk.fei.videoeditor.fetch.StoragePath;
 
 import static android.widget.GridLayout.HORIZONTAL;
 
@@ -55,12 +56,15 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
 
     RowItem selectedItem;
 
+    TextView noItemsText, numberOfSongs;
+    ImageView noItems;
     private MenuItem searchMenuItem;
     String mode;
     String fileType = ".mp3";
     File root = Environment.getExternalStorageDirectory();
     SearchView searchView;
     AudioRecycleViewAdapter adapter;
+    LinearLayout linearLayout;
 
     int itemLayout;
 
@@ -68,18 +72,12 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.audio_chooser);
+        setContentView(R.layout.recycle_list_view);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getString(R.string.my_music));
 
-        Intent intent = getIntent();
-
-        if(intent != null ){
-            //mode = intent.getStringExtra("mode");
-
-        }
-
+        initViews();
         if (checkPermission()) {
             fetchFiles();
         }else{
@@ -88,23 +86,38 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onStart() {
         super.onStart();
     }
 
+    private void initViews(){
+        numberOfSongs = findViewById(R.id.numberOfFiles);
+        noItems = findViewById(R.id.noItems);
+        noItemsText = findViewById(R.id.noItemsText);
+        noItemsText.setText("NO AUDIO");
+        recyclerView = findViewById(R.id.recycleList);
+        linearLayout = findViewById(R.id.media_root_layout);
+    }
+
     private void fetchFiles(){
 
-        if (!root.exists()) {
-            root.mkdirs();
-            setContentView(R.layout.no_items);
-        }
-        else{
-            List<RowItem> rowItems = new ArrayList<>();
-            recyclerView = findViewById(R.id.audioList);
+        List<RowItem> rowItems = new ArrayList<>();
 
-            rowItems = FetchFiles.getFiles(root,fileType);
+        StoragePath storagePath;
+        storagePath = new StoragePath(getExternalFilesDirs(null));
+
+        String[] storages;
+        storages = storagePath.getDeviceStorages();
+
+        for(int i = 0; i < storages.length; i++){
+            Log.d("storages",storages[i]);
+        }
+
+
+        for(int i = 0; i < storages.length; i++){
+        rowItems.addAll(FetchFiles.getAudios(new File(storages[i]),fileType));
+            }
 
             if(!rowItems.isEmpty()){
 
@@ -112,6 +125,7 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
                     Log.d("rowItem",r.toString());
                 }
                 itemLayout = R.layout.item_audio;
+
                 adapter = new AudioRecycleViewAdapter(this, itemLayout,rowItems,this);
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -123,9 +137,20 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
                 recyclerView.addItemDecoration(itemDecor);
             }
             else {
-                setContentView(R.layout.no_items); //if no video has been created
+                recyclerView.setVisibility(View.GONE);
+                noItems.setVisibility(View.VISIBLE);
+                noItemsText.setVisibility(View.VISIBLE);
+                Snackbar snackbar = Snackbar
+                        .make(linearLayout, "You have to upload some songs before processing.",Snackbar.LENGTH_INDEFINITE)
+                        .setAction("OK", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                finish();
+                            }
+                        });
+                snackbar.show();
             }
-        }
+
     }
 
     @Override
@@ -141,7 +166,8 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if (item.getItemId() == R.id.home) {
+        if (item.getItemId() == R.id.about) {
+            About.CreateDialog(this);
         }
 
         return super.onOptionsItemSelected(item);
@@ -194,40 +220,30 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
         setResult(REQUEST_AUDIO, intent);
         finish();
 
-//        switch (mode) {
-//            case "audio": {
-//                Intent i = new Intent(MediaFileRecycleView.this, AudioPreview.class);
-//                i.putExtra("audioPath", rowItem.getFile().getAbsolutePath());
-//                startActivity(i);
-//                break;
-//            }
-//            case "video": {
-//                Intent i = new Intent(MediaFileRecycleView.this, TrimVideo.class);
-//                i.putExtra("uri", rowItem.getFile().getAbsolutePath());
-//                i.putExtra("audioUri", audioUri);
-//                startActivity(i);
-//                break;
-//            }
-//            case "myVideos": {
-//                Intent i = new Intent(MediaFileRecycleView.this, VideoViewer.class);
-//                i.putExtra("filePath", rowItem.getFile().getAbsolutePath());
-//                startActivity(i);
-//                break;
-//            }
-//        }
+    }
+
+    @Override
+    public void onRefreshData() {
+        String songsFound = getResources().getQuantityString(R.plurals.numberOfSongsAvailable,adapter.getItemCount(),adapter.getItemCount());
+        numberOfSongs.setText(songsFound);
     }
 
     @Override
     protected void onPause() {
+        if(adapter != null){
         adapter.onPauseMediaPlayer();
-
+        }
         super.onPause();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+
     @Override
     protected void onRestart() {
-        adapter.onRestartMediaPLayer();
+        if(adapter != null){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                adapter.onRestartMediaPLayer();
+            }
+        }
         super.onRestart();
     }
 
@@ -238,9 +254,8 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
     private void requestPermission() {
         ActivityCompat.requestPermissions(AudioFileRecycleView.this, new String[]
                 {android.Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
-
     }
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {

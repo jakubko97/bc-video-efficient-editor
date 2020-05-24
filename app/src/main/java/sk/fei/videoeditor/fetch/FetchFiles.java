@@ -1,20 +1,9 @@
 package sk.fei.videoeditor.fetch;
 
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
 import android.media.MediaPlayer;
-import android.os.Environment;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.ListResult;
-import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,12 +11,14 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import sk.fei.videoeditor.beans.Directory;
+import sk.fei.videoeditor.beans.Album;
 import sk.fei.videoeditor.beans.RowItem;
+
 
 public class FetchFiles {
 
-    public static List<RowItem> getFiles(File root, String fileType) {
+
+    public static List<RowItem> getAudios(File root, String fileType) {
         ArrayList<File> songs = new ArrayList<>();
         songs = readSongs(root,fileType);
         List<RowItem> rowItems = new ArrayList<>();
@@ -60,6 +51,70 @@ public class FetchFiles {
         return rowItems;
     }
 
+    public static List<Album> getFiles(File root, String fileType) {
+
+        ArrayList<Album> albums = new ArrayList<>();
+        ArrayList<File> songs = new ArrayList<>();
+
+        songs = readSongs(root,fileType);
+        List<RowItem> rowItems = new ArrayList<>();
+
+        if (!songs.isEmpty()) {
+
+            String[] songNames = new String[songs.size()];
+            String[] descriptions = new String[songs.size()];
+            Date[] dateCreated = new Date[songs.size()];
+
+            for (int i = 0; i < songs.size(); ++i) {
+                boolean addedToAlbum = false;
+                //files.add(songs.get(i));
+                songNames[i] = songs.get(i).getName().replace(fileType, "");
+                descriptions[i] = "";
+                dateCreated[i] = getDateCreated(i, songs);
+
+                RowItem item = new RowItem(songNames[i], descriptions[i], songs.get(i), dateCreated[i]);
+                String unit = "MB";
+                item.setSize(getFileSize(songs.get(i), unit));
+                item.setParent(songs.get(i).getParentFile());
+                rowItems.add(item);
+                if( i == 0){
+                Album album = new Album();
+                album.setFile(item.getParent());
+                album.getRowItems().add(item);
+                album.setName(item.getParent().getName());
+                albums.add(album);
+                }else{
+                   for(Album album : albums){
+                       if(album.getFile().equals(item.getParent())){
+                           album.getRowItems().add(item);
+                           addedToAlbum = true;
+                           break;
+                       }
+                   }
+                   if(!addedToAlbum){
+                       Album album = new Album();
+                       album.setFile(item.getParent());
+                       album.getRowItems().add(item);
+                       album.setName(item.getParent().getName());
+                       albums.add(album);
+                   }
+                }
+            }
+
+            for(Album album : albums){
+                Collections.sort(album.getRowItems(), new Comparator<RowItem>() {
+                    @Override
+                    public int compare(RowItem row1, RowItem row2) {
+                        return (row2.getDateCreated()).compareTo(row1.getDateCreated());
+                    }
+                });
+            }
+
+        }
+
+        return albums;
+    }
+
     private static int getMediaDuration(ArrayList<File> songs, int i) {
         MediaPlayer mp = new MediaPlayer();
         try {
@@ -73,41 +128,7 @@ public class FetchFiles {
     }
 
 
-    public static Directory walk(File root){
-
-        Directory dirs = new Directory();
-        dirs.setFile(root);
-        dirs.setName(root.getName());
-
-        if(root.isDirectory()){
-           File[] files = root.listFiles();
-
-//            File[] children = root.listFiles(new FileFilter() {
-//                public boolean accept(File file) {
-//                    return file.isDirectory() || file.getName().toLowerCase().endsWith(".mp4");
-//                }
-//            });
-
-            assert files != null;
-                for (File file : files) {
-
-                    if(!file.isDirectory() && !file.getName().endsWith(".mp4")){
-                    }else{
-                        dirs.getFiles().add(walk(file));
-                        if(file.getName().endsWith(".mp4")){
-                            dirs.setHasVideo(true);
-                        }
-                    }
-                 }
-        }
-       // Log.d("dir", "->"+ dirs.getName());
-
-        return dirs;
-    }
-
-
     private static ArrayList<File> readSongs(File root, String fileType){
-
 
         ArrayList<File> arrayList = new ArrayList<>();
         File[] files = root.listFiles();

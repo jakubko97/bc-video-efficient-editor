@@ -39,6 +39,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 
 import sk.fei.videoeditor.R;
+import sk.fei.videoeditor.activities.MediaFileRecycleView;
 import sk.fei.videoeditor.beans.RowItem;
 
 public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleViewAdapter.ViewHolder> implements Filterable {
@@ -50,6 +51,7 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
     private RowItemsListener listener;
     private boolean isActionMode;
     int itemLayoutId;
+
     ActionMode actionMode;
 
     private boolean multiSelect = false;
@@ -104,6 +106,7 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 itemsFiltered = (ArrayList<RowItem>) filterResults.values;
                 notifyDataSetChanged();
+                listener.onRefreshData();
             }
         };
     }
@@ -129,7 +132,7 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
             } else if(itemLayoutId == R.layout.audio){
 
             txtTitle = itemView.findViewById(R.id.mediaTitle);
-            txtDesc = itemView.findViewById(R.id.mediaDescription);
+            //txtDesc = itemView.findViewById(R.id.mediaDescription);
             imageView = itemView.findViewById(R.id.mediaIcon);
             txtDateCreated = itemView.findViewById(R.id.mediaDateCreated);
             linearLayout = itemView.findViewById(R.id.row_item_root);
@@ -150,7 +153,7 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
             // Get the state
             // Set the visibility based on state
             if(itemLayoutId == R.layout.audio){
-                txtDesc.setText(rowItem.getDesc());
+                //txtDesc.setText(rowItem.getDesc());
                 size.setText(rowItem.getSize());
 
                 SimpleDateFormat timeStampFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
@@ -218,6 +221,8 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
                     }
                 }
             });
+
+            listener.onRefreshData();
         }
 
     }
@@ -298,19 +303,10 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
 
     public interface RowItemsListener {
         void onRowItemSelected(RowItem rowItem);
+        void onRefreshData();
     }
 
-    private static ArrayList<File> listFile(File root){
 
-        ArrayList<File> arrayList = new ArrayList<>();
-        File[] files = root.listFiles();
 
-        assert files != null;
-        for (File file : files) {
-            arrayList.add(file);
-
-        }
-        return arrayList;
-    }
 
 }

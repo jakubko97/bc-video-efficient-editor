@@ -104,7 +104,7 @@ public class Camera extends AppCompatActivity {
         camera.setMode(Mode.VIDEO);
         camera.setAudio(Audio.OFF);
         camera.setVideoCodec(VideoCodec.H_264);
-        camera.setFlash(Flash.TORCH);
+        camera.setFlash(Flash.OFF);
 
         closeCam = findViewById(R.id.close_cam);
         selectAudioFab = findViewById(R.id.selectAudio);
@@ -221,22 +221,22 @@ public class Camera extends AppCompatActivity {
 
     private void animateTextView(){
         selectAudioFab.setText(R.string.audio_selected);
-
-        final ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 1.0f);
-        animator.setRepeatCount(ValueAnimator.INFINITE);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.setDuration(9000L);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                final float progress = (float) animation.getAnimatedValue();
-                final float width = selectAudioFab.getWidth();
-                final float translationX = width * progress;
-                //selectAudioFab.setTranslationX(translationX);
-                //second.setTranslationX(translationX - width);
-            }
-        });
-        animator.start();
+//
+//        final ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 1.0f);
+//        animator.setRepeatCount(ValueAnimator.INFINITE);
+//        animator.setInterpolator(new LinearInterpolator());
+//        animator.setDuration(9000L);
+//        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator animation) {
+//                final float progress = (float) animation.getAnimatedValue();
+//                final float width = selectAudioFab.getWidth();
+//                final float translationX = width * progress;
+//                //selectAudioFab.setTranslationX(translationX);
+//                //second.setTranslationX(translationX - width);
+//            }
+//        });
+//        animator.start();
     }
 
     private void openAudio(View v){
@@ -395,7 +395,6 @@ public class Camera extends AppCompatActivity {
         }
         if (valid && !camera.isOpened()) {
             camera.open();
-            initializePlayer();
         }
     }
 

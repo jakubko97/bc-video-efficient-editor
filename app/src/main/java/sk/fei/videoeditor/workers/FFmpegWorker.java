@@ -40,6 +40,7 @@ public class FFmpegWorker extends Worker {
     private final static AtomicInteger c = new AtomicInteger(0);
     private NotificationManager mNotifyManager;
     private NotificationCompat.Builder mBuilder;
+    private Uri soundUri;
 
     public FFmpegWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -141,6 +142,8 @@ public class FFmpegWorker extends Worker {
              mBuilder.setContentText("Video process complete")
                         // Removes the progress bar
                      .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                     .setSound(soundUri)
+                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setProgress(0,0,false);
              mNotifyManager.notify(id, mBuilder.build());
             }
@@ -189,7 +192,7 @@ public class FFmpegWorker extends Worker {
 
     private void createNotification(){
 
-        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         mNotifyManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -211,8 +214,8 @@ public class FFmpegWorker extends Worker {
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .build();
-            NotificationChannel channel = new NotificationChannel(channelID, "Download video", NotificationManager.IMPORTANCE_HIGH);
-            channel.setSound(soundUri,attr);
+            NotificationChannel channel = new NotificationChannel(channelID, "Download video", NotificationManager.IMPORTANCE_LOW);
+            //channel.setSound(soundUri,attr);
             assert mNotifyManager != null;
             mBuilder.setChannelId(channelID);
             mNotifyManager.createNotificationChannel(channel);
@@ -225,8 +228,6 @@ public class FFmpegWorker extends Worker {
                     .setOngoing(false)
                     .setCategory(NotificationCompat.CATEGORY_PROGRESS)
                     .setAutoCancel(true)
-                    .setSound(soundUri)
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setSmallIcon(android.R.drawable.stat_sys_download);
 
             mNotifyManager.notify(id, mBuilder.build());

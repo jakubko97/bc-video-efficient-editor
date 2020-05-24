@@ -7,7 +7,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,23 +15,19 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,20 +38,21 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.shape.MaterialShapeUtils;
+import com.google.android.material.snackbar.Snackbar;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import sk.fei.videoeditor.R;
 import sk.fei.videoeditor.adapters.VideoRecycleViewAdapter;
-import sk.fei.videoeditor.animations.Animations;
+import sk.fei.videoeditor.beans.Album;
 import sk.fei.videoeditor.beans.RowItem;
+import sk.fei.videoeditor.dialogs.About;
 import sk.fei.videoeditor.fetch.FetchFiles;
-
-import static android.widget.GridLayout.HORIZONTAL;
 
 public class MediaFileRecycleView extends AppCompatActivity implements SearchView.OnQueryTextListener, VideoRecycleViewAdapter.RowItemsListener {
 
@@ -74,9 +70,11 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
     int itemLayout;
     FloatingActionButton showActionFab, recordVideoFab, galleryFab,fab3;
     boolean isFABOpen = false;
-    TextView noItemsText;
+    TextView noItemsText, numberOfFiles, pathTitle;
     ImageView noItems;
     SpeedDialView speedDialView;
+    boolean playable = true;
+    CoordinatorLayout coordinatorLayout;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
@@ -90,9 +88,7 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
     private void openVideo(){
 
         // Permission has already been granted
-        Intent i = new Intent(this, GalleryRecycleView.class);
-//        i.putExtra("mode","video");
-//        i.putExtra("audioUri",selectedAudio.toString());
+        Intent i = new Intent(this, FolderRecycleView.class);
         startActivity(i);
 
     }
@@ -100,8 +96,6 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
     private void captureVideo() {
         // Permission has already been granted
         Intent i = new Intent(this, Camera.class);
-//        i.putExtra("audioUri",selectedAudio.toString());
-//        i.putExtra("mode","withAudio");
         startActivity(i);
     }
 
@@ -146,13 +140,17 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
         super.onResume();
     }
 
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void initViews(){
 
+        coordinatorLayout = findViewById(R.id.home_root_coordinator);
+        numberOfFiles = findViewById(R.id.numberOfFiles);
+        pathTitle = findViewById(R.id.path);
         noItems = findViewById(R.id.noItems);
         noItemsText = findViewById(R.id.noItemsText);
         mSwipeRefreshLayout = findViewById(R.id.swipeRefresh);
-        recyclerView = findViewById(R.id.audioList);
+        recyclerView = findViewById(R.id.recycleList);
 
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -163,18 +161,8 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
             }
         });
 
-//        showActionFab = (FloatingActionButton) findViewById(R.id.fab);
-//        recordVideoFab = (FloatingActionButton) findViewById(R.id.fab1);
-//        galleryFab = (FloatingActionButton) findViewById(R.id.fab2);
-
         speedDialView = findViewById(R.id.speedDial);
         MaterialShapeUtils.setParentAbsoluteElevation(speedDialView);
-        //speedDialView.inflate(R.menu.search_menu);
-
-//        Animations.init(recordVideoFab);
-//        Animations.init(galleryFab);
-        //isRotate = false;
-
 
         speedDialView.setOnChangeListener(new SpeedDialView.OnChangeListener() {
             @Override
@@ -228,99 +216,70 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
             }
         });
 
-//        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) speedDialView.getLayoutParams();
-//        params.setBehavior(new SpeedDialView.ScrollingViewSnackbarBehavior());
-//        speedDialView.requestLayout();
-
-//        showActionFab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                isRotate = Animations.rotateFab(view,!isRotate);
-//
-//                if(isRotate){
-//                    Animations.showIn(recordVideoFab);
-//                    Animations.showIn(galleryFab);
-//                }else{
-//                    Animations.showOut(recordVideoFab);
-//                    Animations.showOut(galleryFab);
-//                }
-//
-//            }
-//        });
-//
-//        recordVideoFab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-////                Animations.showOut(recordVideoFab);
-////                Animations.showOut(galleryFab);
-//                captureVideo();
-//            }
-//        });
-//
-//        galleryFab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-////                Animations.showOut(recordVideoFab);
-////                Animations.showOut(galleryFab);
-//                openVideo();
-//            }
-//        });
     }
 
     private void fetchFiles(){
          File root = Environment.getExternalStorageDirectory();
             root = new File(root, "My Video Editor");
+
+            Log.d("root", root.getAbsolutePath());
         if (!root.exists()) {
             root.mkdirs();
             recyclerView.setVisibility(View.GONE);
+            numberOfFiles.setVisibility(View.GONE);
             noItems.setVisibility(View.VISIBLE);
             noItemsText.setVisibility(View.VISIBLE);
         }
         else{
 
-            List<RowItem> rowItems = new ArrayList<>();
+            //List<RowItem> rowItems = new ArrayList<>();
 
-            mSwipeRefreshLayout.setColorSchemeResources(R.color.primary_accent);
-
-            mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    fetchFiles();
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
-            });
+            List<Album> albums = new ArrayList<>();
 
             String fileType = ".mp4";
-            rowItems = FetchFiles.getFiles(root,fileType);
+            //rowItems = FetchFiles.getFiles(root,fileType);
+            albums = FetchFiles.getFiles(root,fileType);
 
+            List<RowItem> rowItems = new ArrayList<>();
 
             Log.d("jakubko",  "velkost rowItems: "+ rowItems.size());
-            if(!rowItems.isEmpty()){
+            if(!albums.isEmpty()){
+
+                rowItems = albums.get(0).getRowItems();
                 recyclerView.setVisibility(View.VISIBLE);
+                numberOfFiles.setVisibility(View.VISIBLE);
+
+                pathTitle.setText("~ "+ albums.get(0).getFile().getAbsolutePath());
                 noItems.setVisibility(View.GONE);
                 noItemsText.setVisibility(View.GONE);
 
                 itemLayout = R.layout.audio;
+
                 adapter = new VideoRecycleViewAdapter(this, itemLayout,rowItems,this,true);
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
+            //recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
             recyclerView.setHasFixedSize(true);
             // Removes blinks
             ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
-            DividerItemDecoration itemDecor = new DividerItemDecoration(getApplicationContext(), HORIZONTAL);
-            recyclerView.addItemDecoration(itemDecor);
+           //DividerItemDecoration itemDecor = new DividerItemDecoration(getApplicationContext(), HORIZONTAL);
+            //recyclerView.addItemDecoration(itemDecor);
             }
             else {
                 getSupportActionBar().setSubtitle("");
                 recyclerView.setVisibility(View.GONE);
+                numberOfFiles.setVisibility(View.GONE);
                 noItems.setVisibility(View.VISIBLE);
                 noItemsText.setVisibility(View.VISIBLE);
             }
         }
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.primary_accent);
+
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            fetchFiles();
+            mSwipeRefreshLayout.setRefreshing(false);
+        });
     }
-
-
 
 
     @Override
@@ -328,6 +287,10 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
 
         if (item.getItemId() == R.id.home) {
             onBackPressed();
+        }
+
+        if (item.getItemId() == R.id.about) {
+            About.CreateDialog(this);
         }
 
         return super.onOptionsItemSelected(item);
@@ -375,14 +338,38 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
             searchView.setQuery("", false);
         }
 
+
+        if(isVideoValid(rowItem.getFile().getAbsoluteFile().toString())){
                 Intent i = new Intent(MediaFileRecycleView.this, VideoViewer.class);
                 i.putExtra("filePath", rowItem.getFile().getAbsolutePath());
                 startActivity(i);
+        }
 
 //        Animations.showOut(recordVideoFab);
 //        Animations.showOut(galleryFab);
     }
 
+    @Override
+    public void onRefreshData() {
+        String songsFound = getResources().getQuantityString(R.plurals.numberOfFiles,adapter.getItemCount(),adapter.getItemCount());
+        numberOfFiles.setText(songsFound);
+    }
+
+    private boolean isVideoValid(String path){
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(path);
+            mediaPlayer.prepare();
+            return true;
+        } catch (IOException e) {
+            Snackbar snackbar = Snackbar
+                    .make(coordinatorLayout, "Video can not be played", Snackbar.LENGTH_LONG);
+            snackbar.show();
+            //Toast.makeText(MediaFileRecycleView.this, "Video can not be played", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+    }
 
     @Override
     protected void onPause() {

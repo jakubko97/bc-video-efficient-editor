@@ -3,9 +3,10 @@ package sk.fei.videoeditor.beans;
 import android.graphics.Bitmap;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Date;
 
-public class RowItem implements Comparable<RowItem>{
+public class RowItem implements Comparable<RowItem>, Serializable {
     private Bitmap imageId;
     private String title;
     private String desc;
@@ -13,6 +14,7 @@ public class RowItem implements Comparable<RowItem>{
     private Date dateCreated;
     private String size;
     private boolean expanded;
+    private File parentFile;
 
 
     public RowItem(String title, String desc, File file, Date dateCreated) {
@@ -21,6 +23,14 @@ public class RowItem implements Comparable<RowItem>{
         this.desc = desc;
         this.file = file;
         this.dateCreated = dateCreated;
+    }
+
+    public File getParent() {
+        return parentFile;
+    }
+
+    public void setParent(File parentFile) {
+        this.parentFile = parentFile;
     }
 
     public boolean isExpanded() {

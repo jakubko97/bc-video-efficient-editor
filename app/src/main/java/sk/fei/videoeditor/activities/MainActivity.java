@@ -40,8 +40,6 @@ public class MainActivity extends AppCompatActivity {
         setAudio = findViewById(R.id.setAudio);
         about = findViewById(R.id.about);
         myVideos = findViewById(R.id.myVideos);
-        help = findViewById(R.id.help);
-
 
         Intent i = getIntent();
 
@@ -61,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        help.setOnClickListener(v -> openHelp());
-
         myVideos.setOnClickListener(v -> openMyVideos());
 
         captureVideo.setOnClickListener(v -> {
@@ -75,12 +71,6 @@ public class MainActivity extends AppCompatActivity {
 
         about.setOnClickListener(v -> openAbout());
     }
-
-    private void openHelp() {
-        Intent i = new Intent(MainActivity.this, Help.class);
-        startActivity(i);
-    }
-
 
 
     private void openMyVideos() {

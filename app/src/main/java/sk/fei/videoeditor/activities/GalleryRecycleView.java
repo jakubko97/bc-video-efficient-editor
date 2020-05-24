@@ -3,51 +3,51 @@ package sk.fei.videoeditor.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import sk.fei.videoeditor.R;
 import sk.fei.videoeditor.adapters.VideoRecycleViewAdapter;
-import sk.fei.videoeditor.beans.Directory;
+import sk.fei.videoeditor.beans.Album;
 import sk.fei.videoeditor.beans.RowItem;
+import sk.fei.videoeditor.dialogs.About;
 import sk.fei.videoeditor.fetch.FetchFiles;
 
 import static android.widget.GridLayout.HORIZONTAL;
 
-public class GalleryRecycleView extends AppCompatActivity implements SearchView.OnQueryTextListener, VideoRecycleViewAdapter.RowItemsListener {
+public class GalleryRecycleView extends AppCompatActivity implements SearchView.OnQueryTextListener, VideoRecycleViewAdapter.RowItemsListener, Serializable {
 
     private static final int PERMISSION_REQUEST_CODE = 100;
     RecyclerView recyclerView;
@@ -58,15 +58,23 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
     SearchView searchView;
     VideoRecycleViewAdapter adapter;
     int itemLayout;
+    List<RowItem> rowItems = new ArrayList<>();
+    String title;
+    TextView numberOfFiles, pathTitle;
+    LinearLayout linearLayout;
+
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery_recycle_view);
+        setContentView(R.layout.recycle_list_view);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(getString(R.string.my_videos));
+
+        initViews();
+        getIntentData();
+        getSupportActionBar().setTitle(title);
 
         if (checkPermission()) {
             fetchFiles();
@@ -76,28 +84,38 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
 
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
     }
 
 
-    private void fetchFiles(){
+    private void getIntentData(){
+        Intent i = getIntent();
 
-        if (!root.exists()) {
-            root.mkdirs();
-            setContentView(R.layout.no_items);
+        if(i != null){
+            Bundle args = i.getBundleExtra("bundle");
+            assert args != null;
+            rowItems = (ArrayList<RowItem>) args.getSerializable("rowItems");
+            title = i.getStringExtra("title");
         }
-        else{
-            List<RowItem> rowItems = new ArrayList<>();
-            recyclerView = findViewById(R.id.videoList);
+    }
 
-            rowItems = FetchFiles.getFiles(root,fileType);
+    private void initViews(){
+
+        linearLayout = findViewById(R.id.media_root_layout);
+        pathTitle = findViewById(R.id.path);
+        numberOfFiles = findViewById(R.id.numberOfFiles);
+        recyclerView = findViewById(R.id.recycleList);
+        itemLayout = R.layout.gallery_view;
+    }
+
+    private void fetchFiles(){
 
             if(!rowItems.isEmpty()){
 
-                itemLayout = R.layout.gallery_view;
+
+                pathTitle.setText("~ "+ rowItems.get(0).getParent().getAbsolutePath());
                 adapter = new VideoRecycleViewAdapter(this, itemLayout,rowItems,this,false);
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
@@ -105,13 +123,13 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
                 recyclerView.setHasFixedSize(true);
                 // Removes blinks
                 ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
-                DividerItemDecoration itemDecor = new DividerItemDecoration(getApplicationContext(), HORIZONTAL);
-                recyclerView.addItemDecoration(itemDecor);
+                //DividerItemDecoration itemDecor = new DividerItemDecoration(getApplicationContext(), HORIZONTAL);
+                //recyclerView.addItemDecoration(itemDecor);
             }
             else {
-                setContentView(R.layout.no_items); //if no video has been created
+
             }
-        }
+
     }
 
     @Override
@@ -128,7 +146,8 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if (item.getItemId() == R.id.home) {
+        if (item.getItemId() == R.id.about) {
+            About.CreateDialog(this);
         }
 
         return super.onOptionsItemSelected(item);
@@ -175,9 +194,33 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
             searchMenuItem.collapseActionView();
             searchView.setQuery("", false);
         }
-        Intent i = new Intent(GalleryRecycleView.this, TrimVideo.class);
-                i.putExtra("uri", rowItem.getFile().getAbsolutePath());
-                startActivity(i);
+        if(isVideoValid(rowItem.getFile().getAbsoluteFile().toString())) {
+            Intent i = new Intent(GalleryRecycleView.this, TrimVideo.class);
+            i.putExtra("uri", rowItem.getFile().getAbsolutePath());
+            startActivity(i);
+        }
+    }
+
+    private boolean isVideoValid(String path){
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(path);
+            mediaPlayer.prepare();
+            return true;
+        } catch (IOException e) {
+            Snackbar snackbar = Snackbar
+                    .make(linearLayout, "The video is not supported.", Snackbar.LENGTH_LONG);
+            snackbar.show();
+            //Toast.makeText(MediaFileRecycleView.this, "Video can not be played", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+    }
+
+    @Override
+    public void onRefreshData() {
+        String songsFound = getResources().getQuantityString(R.plurals.numberOfFiles,adapter.getItemCount(),adapter.getItemCount());
+        numberOfFiles.setText(songsFound);
     }
 
 

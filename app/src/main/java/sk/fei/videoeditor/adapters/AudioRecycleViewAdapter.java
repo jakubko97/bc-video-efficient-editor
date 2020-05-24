@@ -94,6 +94,7 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 itemsFiltered = (ArrayList<RowItem>) filterResults.values;
                 notifyDataSetChanged();
+                listener.onRefreshData();
             }
         };
     }
@@ -120,7 +121,8 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
                 linearLayout = itemView.findViewById(R.id.parent);
 
                 layoutExpand = itemView.findViewById(R.id.layoutExpand);
-
+                layoutExpand.setTag(this);
+                Log.d("tag", layoutExpand.getTag().toString());
                 duration = itemView.findViewById(R.id.durationAudio);
                 currentPosition = itemView.findViewById(R.id.currentPositionAudio);
                 seekBar = itemView.findViewById(R.id.audioSeekBar);
@@ -131,6 +133,7 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
                     @Override
                     public void onClick(View v) {
                         listener.onRowItemSelected(itemsFiltered.get(getAdapterPosition()));
+                        itemsFiltered.get(getAdapterPosition()).setExpanded(false);
                     }
                 });
 
@@ -170,6 +173,7 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
 
             txtTitle.setText(rowItem.getTitle());
 
+            itemView.setTag(rowItem);
                 RequestOptions requestOptions = new RequestOptions()
                         .placeholder(R.mipmap.audio);
 
@@ -233,6 +237,7 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
 //            }
 //        }
 
+        @RequiresApi(api = Build.VERSION_CODES.Q)
         void update(final RowItem rowItem) {
             linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -246,6 +251,9 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
                 public void onClick(View view) {
                         Log.d("rowItem", rowItem.getFile().getAbsolutePath()  + " title" + rowItem.getTitle());
                     Log.d("rowItem", view.toString());
+
+                    layoutExpand.getTag().equals(rowItem);
+
 
                     boolean show = toggleLayout(!rowItem.isExpanded(), addAudio, layoutExpand);
                         rowItem.setExpanded(show);
@@ -275,6 +283,16 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
 
                 }
             });
+
+    if(rowItem.isExpanded()){
+        Animations.expand(layoutExpand);
+    Animations.toggleArrow(addAudio, true);
+    }else{
+    Animations.collapse(layoutExpand);
+    Animations.toggleArrow(addAudio, false);
+    }
+
+            listener.onRefreshData();
         }
 
         public void initAudioPlayer(RowItem rowItem){
@@ -335,6 +353,7 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
         return viewHolder;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Get the data model based on position
@@ -343,10 +362,8 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
         holder.bind(rowItem);
         holder.update(rowItem);
 
-//        String songsFound = context.getResources().getQuantityString(R.plurals.numberOfSongsAvailable, getItemCount(),getItemCount());
-//        ((AppCompatActivity)holder.itemView.getContext()).getSupportActionBar().setSubtitle(songsFound);
 
-        // Set item views based on your views and data model
+
 
     }
 
@@ -357,6 +374,7 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
 
     public interface RowItemsListener {
         void onRowItemSelected(RowItem rowItem);
+        void onRefreshData();
     }
 
     public void onPauseMediaPlayer(){
@@ -379,9 +397,9 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
     private boolean toggleLayout(boolean isExpanded, ExtendedFloatingActionButton b, LinearLayout layoutExpand) {
         Animations.toggleArrow(b, isExpanded);
         if (isExpanded) {
-            Animations.showIn(layoutExpand);
+            Animations.expand(layoutExpand);
         } else {
-            Animations.showOut(layoutExpand);
+            Animations.collapse(layoutExpand);
         }
         return isExpanded;
 

@@ -40,24 +40,19 @@
             android:name=".activities.GalleryRecycleView"
             android:label="@string/gallery_recycle_view"
             android:screenOrientation="fullSensor"
-            android:parentActivityName=".activities.MediaFileRecycleView"/>
+            android:parentActivityName=".activities.FolderRecycleView"/>
         <activity
-            android:name=".activities.Help"
-            android:label="@string/help"
-            android:parentActivityName=".activities.MainActivity"
-            />
+            android:name=".activities.FolderRecycleView"
+            android:label="@string/folder_view"
+            android:screenOrientation="fullSensor"
+            android:parentActivityName=".activities.MediaFileRecycleView"/>
         <activity
             android:name=".activities.VideoViewer"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="fullSensor"
             android:parentActivityName=".activities.MediaFileRecycleView"
             />
-        <activity
-            android:name=".activities.AudioPreview"
-            android:label="@string/audio_preview_activity"
-            android:parentActivityName=".activities.MediaFileRecycleView"
-            android:screenOrientation="fullSensor"
-             />
+
         <activity
             android:name=".activities.AudioFileRecycleView"
             android:label="@string/my_music"
@@ -88,7 +83,7 @@
         </activity>
         <activity
             android:name=".activities.Camera"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
             />
         <activity
@@ -96,7 +91,8 @@
             android:icon="@mipmap/ic_pause"
             android:label="@string/title_activity_trim"
             android:parentActivityName=".activities.GalleryRecycleView"
-            android:screenOrientation="fullSensor"
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:screenOrientation="portrait"
             />
         <activity
             android:name=".activities.VideoPreview"
@@ -110,6 +106,17 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
     </application>
 
 </manifest>

@@ -1,7 +1,9 @@
 package sk.fei.videoeditor.activities;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -16,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -54,6 +57,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.DefaultTimeBar;
 import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
@@ -81,6 +85,7 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
     String TAG = "Video Preview";
     private String mode;
     SimpleExoPlayer player;
+    SimpleExoPlayerView playerView;
     MediaPlayer audioPlayer;
     int duration;
     File dest;
@@ -94,10 +99,11 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
     Constraints mConstraints;
     MediaSource video,audio;
     private  DataSource.Factory dataSourceFactory;
+    private Dialog mFullScreenDialog;
     float pts;
     Handler handler;
-    PlayerControlView controls;
 
+    ImageView close,save;
     DefaultTimeBar timeBar;
     TextView exoCurrentPosition, exoDuration;
 
@@ -108,11 +114,11 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getSupportActionBar().hide();
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-
-        setContentView(R.layout.activity_video);
-
+        setContentView(R.layout.activity_video_view);
         setDataFromIntent();
         setViewsLayout();
     }
@@ -136,7 +142,6 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
         timeBar = findViewById(R.id.exo_progress);
         exoCurrentPosition = findViewById(R.id.exo_position);
         exoDuration = findViewById(R.id.exo_duration);
-        controls = findViewById(R.id.exo_controller);
 
         dataSourceFactory =
                 new DefaultDataSourceFactory(
@@ -146,15 +151,19 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
     private boolean setRetake(){
 
         if(isSaved){
-           finish();
+            Intent intent = new Intent(getApplicationContext(), MediaFileRecycleView.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
            return true;
         }else{
-            if(videoUri != null){
+            if(videoUri != null && !mode.equals("trimmedVideo")){
                 File file = new File(Objects.requireNonNull(videoUri.getPath()));
                 if(file.exists()){
                     finish();
                     return file.delete();
                 }
+            }else if(mode.equals("trimmedVideo")){
+                finish();
             }
         }
         return false;
@@ -166,11 +175,8 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
                 .setRequiresBatteryNotLow(true)
                 .build();
 
-        Log.d("videoPreview", "createWorker          ..............." );
-
         OneTimeWorkRequest mRequest = new OneTimeWorkRequest.Builder(FFmpegWorker.class)
                 .setInputData(createInputData(command,duration,dest.getPath()))
-                .setConstraints(mConstraints)
                 .build();
         WorkManager mWorkManager = WorkManager.getInstance();
         mWorkManager.beginWith(mRequest).enqueue();
@@ -191,9 +197,7 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
         Intent i = getIntent();
 
         if(i!=null) {
-            String imgPath = i.getStringExtra("uri");
             mode = i.getStringExtra("mode");
-
             if(mode.equals("trimmedVideo")){
                 duration = i.getIntExtra("duration", 0);
                 command = i.getStringArrayExtra("command");
@@ -207,30 +211,17 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
             }
             else{
                 createOutputFilePath();
-                Log.d("jakubko", "mode: "+mode);
-
                 duration = videoResult.getMaxDuration();
                 audioUri = Uri.parse(i.getStringExtra("audioUri"));
-
                 videoUri = Uri.fromFile(videoResult.getFile());
-
                 if(mode.equals("maxDurationReached")){
                     command = new String[]{"-i" ,videoResult.getFile().getPath(), "-i", audioUri.getPath(), "-map", "0:v", "-map", "1:a", "-c", "copy", "-shortest",dest.getAbsolutePath()};
-
                 }
                 else if(mode.equals("earlyStop")){
                     pts = getVideoDuration()/(float)getAudioDuration();
-
                     command = new String[]{"-i", videoResult.getFile().getPath(),"-i", audioUri.getPath(), "-filter:v", "setpts=PTS/"+pts+"","-acodec", "copy", dest.getAbsolutePath()};
-                    //command = new String[]{"-i", videoResult.getFile().getPath(), "-filter_complex", "setpts=PTS/"+pts+"[v]", "-map", "[v]", "-preset", "ultrafast", dest.getAbsolutePath()};
-                    //command2 = new String[]{"-i", dest.getAbsolutePath(), "-i", audioUri.getPath(), "-map", "0:v", "-map", "1:a", "-c", "copy", "-shortest", dest2.getAbsolutePath()};
-
-                    Log.d("jakubko","setpts=PTS/"+pts+"[v]" + getVideoDuration() +"/"+getAudioDuration());
                 }
-
             }
-
-
         }
     }
 
@@ -282,7 +273,6 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        Drawable resIcon = getResources().getDrawable(R.drawable.ic_file_download_white_24dp);
 
         switch (item.getItemId()){
             case android.R.id.home:
@@ -291,10 +281,6 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
 
             case R.id.save :
 
-                createWorker();
-                item.setEnabled(false);
-                resIcon.mutate().setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN);
-                item.setIcon(resIcon);
         }
 
         return super.onOptionsItemSelected(item);
@@ -307,6 +293,8 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
                 .putString("path",path)
                 .build();
     }
+
+
 
     private ExoPlayer.EventListener eventListener = new ExoPlayer.EventListener() {
 
@@ -370,7 +358,7 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
     @Override
     protected void onStart() {
         super.onStart();
-        initializePlayer();
+
     }
 
     @Override
@@ -387,9 +375,56 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
 
     }
 
+    private void initExoControlers(){
+        playerView =  findViewById(R.id.exoplayer);
+        playerView.findViewById(R.id.exo_share).setVisibility(View.GONE);
+        playerView.findViewById(R.id.exo_delete).setVisibility(View.GONE);
+
+        close = playerView.findViewById(R.id.exo_close);
+        save = playerView.findViewById(R.id.exo_save);
+        save.setVisibility(View.VISIBLE);
+
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFullScreenDialog.dismiss();
+                setRetake();
+            }
+        });
+
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Drawable resIcon = getResources().getDrawable(R.drawable.ic_file_download_white_24dp);
+                createWorker();
+                save.setEnabled(false);
+                isSaved = true;
+                resIcon.mutate().setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN);
+                save.setImageDrawable(resIcon);
+            }
+        });
+
+
+    }
+
     @Override
     protected void onResume() {
+
         super.onResume();
+
+        if (playerView == null) {
+            initExoControlers();
+            initFullscreenDialog();
+        }
+        initializePlayer();
+        openFullscreenDialog();
+
+        ((ViewGroup) playerView.getParent()).removeView(playerView);
+        mFullScreenDialog.addContentView(playerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        // mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(VideoViewer.this, R.mipmap.ic_fullscreen_skrink_foreground));
+        mFullScreenDialog.show();
+
     }
 
 
@@ -408,10 +443,10 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
 
         //Initialize the player
         player = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
-
         //Initialize simpleExoPlayerView
-        SimpleExoPlayerView simpleExoPlayerView = findViewById(R.id.exoplayer);
-        simpleExoPlayerView.setPlayer(player);
+        playerView = findViewById(R.id.exoplayer);
+        playerView.setPlayer(player);
+
 
         audio = buildMediaSource(audioUri);
         video = buildMediaSource(videoUri);
@@ -505,6 +540,27 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
             return  String.format("%02d", mn) + ':' + String.format("%02d", sec);
         }
         return String.format("%02d", hr) + ':' + String.format("%02d", mn) + ':' + String.format("%02d", sec)+ '.' + String.format("%03d", ms);
+
+    }
+
+
+    private void initFullscreenDialog() {
+
+        mFullScreenDialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+            public void onBackPressed() {
+                mFullScreenDialog.dismiss();
+                finish();
+            }
+        };
+
+    }
+
+    private void openFullscreenDialog() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        ((ViewGroup) playerView.getParent()).removeView(playerView);
+        mFullScreenDialog.addContentView(playerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        //mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(VideoViewer.this, R.mipmap.ic_fullscreen_skrink_foreground));
+        mFullScreenDialog.show();
 
     }
 

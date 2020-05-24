@@ -164,7 +164,7 @@ public class TrimVideo extends AppCompatActivity {
         startActivityForResult(i,REQUEST_AUDIO_TRIM);
     }
 
-    private void initMediaPlayer(){
+    private MediaPlayer initMediaPlayer(){
         audioPlayer = new MediaPlayer();
         try {
             audioPlayer.setDataSource(audioUri.getPath());
@@ -174,6 +174,7 @@ public class TrimVideo extends AppCompatActivity {
         }
         audioPlayer.start();
 
+        return audioPlayer;
     }
 
     @SuppressLint("DefaultLocale")
@@ -367,9 +368,13 @@ public class TrimVideo extends AppCompatActivity {
         }
         player = createFullPlayer();
         if(audioUri != null){
-            initMediaPlayer();
+            audioPlayer = initMediaPlayer();
+            setGap(audioPlayer, player);
         }
         playerView = findViewById(R.id.exoplayer);
+        playerView.findViewById(R.id.exo_close).setVisibility(View.GONE);
+        playerView.findViewById(R.id.exo_share).setVisibility(View.GONE);
+        playerView.findViewById(R.id.exo_delete).setVisibility(View.GONE);
         playerView.setPlayer(player);
 
     }
@@ -417,9 +422,16 @@ public class TrimVideo extends AppCompatActivity {
 
         rangeSeekBar.setMaxValue((int) player.getDuration());
         rangeSeekBar.setMinValue(0);
-        rangeSeekBar.setEnabled(true);
 
         maxValueChanged = (int)player.getDuration();
+    }
+
+    private void setGap(MediaPlayer audioPlayer, SimpleExoPlayer player){
+        if(audioUri != null){
+            if(audioPlayer.getDuration() < player.getDuration()){
+                rangeSeekBar.setMaxValue(audioPlayer.getDuration());
+            }
+        }
     }
 
     @Override
@@ -429,6 +441,7 @@ public class TrimVideo extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_AUDIO_TRIM && resultCode == REQUEST_AUDIO) {
             audioUri = Uri.parse(intent.getStringExtra("audioUri"));
+
             //Toast.makeText(Camera.this,"Select audio before recording." + intent.getStringExtra("audioUri"),Toast.LENGTH_LONG).show();
         }
     }

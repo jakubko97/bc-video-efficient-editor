@@ -3,20 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:id="@+id/root_video_view"
     tools:context=".activities.VideoViewer">
 
     <FrameLayout
         android:id="@+id/main_media_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000000">
+        android:background="@color/colorBlack">
 
-        <com.google.android.exoplayer2.ui.PlayerView
+        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
             android:id="@+id/exoplayer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center" />
+            app:controller_layout_id="@layout/exo_playback_control_view"
+            />
 
     </FrameLayout>
 

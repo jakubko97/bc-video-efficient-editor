@@ -40,8 +40,8 @@
         <!--on which they appear.-->
         <item name="colorOnPrimary">@color/white_50</item>
         <item name="colorOnSecondary">@color/white_50</item>
-        <item name="colorOnBackground">@color/white</item>
-        <item name="colorOnSurface">@color/material_gray_100</item>
+        <item name="colorOnBackground">@color/black_900</item>
+        <item name="colorOnSurface">@color/black_900</item>
         <item name="colorOnError">@color/white_50</item>
         <item name="colorControlHighlight">@color/purple_200</item>
 
