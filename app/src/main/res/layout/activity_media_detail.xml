@@ -86,6 +86,7 @@
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:alpha="0.8"
         app:clickable_overlay="true"
       />
 
@@ -97,6 +98,8 @@
         android:layout_margin="2dp"
         android:backgroundTintMode="src_over"
         app:sdExpansionMode="top"
+        android:animateLayoutChanges="true"
+        android:animationCache="true"
         android:elevation="11dp"
         app:sdMainFabAnimationRotateAngle="90"
         app:sdMainFabClosedIconColor="@color/white"

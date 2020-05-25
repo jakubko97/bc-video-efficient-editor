@@ -13,7 +13,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -117,11 +120,11 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();
-
         setContentView(R.layout.activity_video_view);
         setDataFromIntent();
         setViewsLayout();
     }
+
 
     private String createOutputFilePath(){
         File folder = new File(Environment.getExternalStorageDirectory() + "/My Video Editor");
@@ -151,9 +154,7 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
     private boolean setRetake(){
 
         if(isSaved){
-            Intent intent = new Intent(getApplicationContext(), MediaFileRecycleView.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            clearAllActivities();
            return true;
         }else{
             if(videoUri != null && !mode.equals("trimmedVideo")){
@@ -167,6 +168,12 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
             }
         }
         return false;
+    }
+
+    private void clearAllActivities(){
+        Intent intent = new Intent(getApplicationContext(), MediaFileRecycleView.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     private boolean createWorker(){
@@ -549,7 +556,11 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
         mFullScreenDialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
             public void onBackPressed() {
                 mFullScreenDialog.dismiss();
-                finish();
+                if(isSaved){
+                    clearAllActivities();
+                }else{
+                    supportFinishAfterTransition();
+                }
             }
         };
 

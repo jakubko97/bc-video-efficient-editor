@@ -3,14 +3,18 @@ package sk.fei.videoeditor.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +30,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,6 +41,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.shape.MaterialShapeUtils;
 import com.google.android.material.snackbar.Snackbar;
@@ -60,27 +66,30 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
     RecyclerView recyclerView;
     RowItem selectedItem;
     private MenuItem searchMenuItem;
-    String mode;
     SwipeRefreshLayout mSwipeRefreshLayout;
 
     boolean doubleBackToExitPressedOnce = false;
-    boolean isRotate = false;
     SearchView searchView;
     VideoRecycleViewAdapter adapter;
     int itemLayout;
-    FloatingActionButton showActionFab, recordVideoFab, galleryFab,fab3;
-    boolean isFABOpen = false;
     TextView noItemsText, numberOfFiles, pathTitle;
     ImageView noItems;
     SpeedDialView speedDialView;
-    boolean playable = true;
     CoordinatorLayout coordinatorLayout;
+    boolean actionMode = false;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media_detail);
+
+        // Check if we're running on Android 5.0 or higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Apply activity transition
+        } else {
+            // Swap without transition
+        }
 
         initViews();
     }
@@ -89,7 +98,13 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
 
         // Permission has already been granted
         Intent i = new Intent(this, FolderRecycleView.class);
-        startActivity(i);
+        if(Build.VERSION.SDK_INT>20){
+            ActivityOptions options =
+                    ActivityOptions.makeSceneTransitionAnimation(this);
+            startActivity(i,options.toBundle());
+        }else {
+            startActivity(i);
+        }
 
     }
 
@@ -114,7 +129,6 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
             searchView.setIconified(true);
             return;
         }
-
 
         if (speedDialView.isOpen()) {
             speedDialView.close();
@@ -151,6 +165,7 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
         noItemsText = findViewById(R.id.noItemsText);
         mSwipeRefreshLayout = findViewById(R.id.swipeRefresh);
         recyclerView = findViewById(R.id.recycleList);
+
 
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -329,7 +344,7 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
     }
 
     @Override
-    public void onRowItemSelected(RowItem rowItem) {
+    public void onRowItemSelected(RowItem rowItem, ImageView sharedImageView) {
 
         selectedItem = rowItem;
 
@@ -340,9 +355,16 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
 
 
         if(isVideoValid(rowItem.getFile().getAbsoluteFile().toString())){
+
                 Intent i = new Intent(MediaFileRecycleView.this, VideoViewer.class);
                 i.putExtra("filePath", rowItem.getFile().getAbsolutePath());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeScaleUpAnimation(sharedImageView,(int)sharedImageView.getX(),(int)sharedImageView.getY(),sharedImageView.getWidth(),sharedImageView.getHeight());
+                startActivity(i, activityOptionsCompat.toBundle());
+            }
+            else{
                 startActivity(i);
+            }
         }
 
 //        Animations.showOut(recordVideoFab);
@@ -350,9 +372,16 @@ public class MediaFileRecycleView extends AppCompatActivity implements SearchVie
     }
 
     @Override
-    public void onRefreshData() {
+    public void onRefreshData(boolean multiselect) {
         String songsFound = getResources().getQuantityString(R.plurals.numberOfFiles,adapter.getItemCount(),adapter.getItemCount());
         numberOfFiles.setText(songsFound);
+
+        if(multiselect){
+            mSwipeRefreshLayout.setEnabled(false);
+        }else{
+            mSwipeRefreshLayout.setEnabled(true);
+
+        }
     }
 
     private boolean isVideoValid(String path){

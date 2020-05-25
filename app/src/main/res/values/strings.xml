@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Video Editor</string>
+    <string name="app_name">Audio Video Mixer</string>
     <string name="title_activity_video">Video preview</string>
     <string name="title_activity_trim">Trim Video</string>
     <string name="about">About</string>

@@ -4,11 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.util.Pair;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -16,11 +20,15 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.transition.Slide;
+import android.transition.TransitionInflater;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -63,6 +71,8 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //this.overridePendingTransition(R.anim.slide, R.anim.slide);
+       // setAnimation();
         setContentView(R.layout.recycle_list_view);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -73,6 +83,18 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
             fetchFiles();
         }else{
             requestPermission();
+        }
+    }
+
+    //Your Slide animation
+    public void setAnimation(){
+        if(Build.VERSION.SDK_INT>20) {
+            Slide slide = new Slide();
+            slide.setSlideEdge(Gravity.RIGHT);
+            slide.setDuration(650);
+            slide.setInterpolator(new DecelerateInterpolator());
+            getWindow().setExitTransition(slide);
+            getWindow().setEnterTransition(slide);
         }
     }
 
@@ -110,10 +132,13 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
         storages = storagePath.getDeviceStorages();
 
         for(int i = 0; i < storages.length; i++){
+            Log.d("storage", storages[i]);
+        }
+
+        for(int i = 0; i < storages.length; i++){
             albums.addAll(FetchFiles.getFiles(new File(storages[i]),fileType));
         }
 //        }
-
             if(!albums.isEmpty()){
                 noItems.setVisibility(View.GONE);
                 noItemsText.setVisibility(View.GONE);
@@ -158,6 +183,9 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
 
         if (item.getItemId() == R.id.about) {
             About.CreateDialog(this);
+        }
+        if(item.getItemId() == android.R.id.home){
+            supportFinishAfterTransition();
         }
 
         return super.onOptionsItemSelected(item);
@@ -235,7 +263,7 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
 
 
     @Override
-    public void onRowItemSelected(Album album) {
+    public void onRowItemSelected(Album album, ImageView sharedImageView) {
 
         Intent i = new Intent(FolderRecycleView.this, GalleryRecycleView.class);
         Bundle args = new Bundle();
@@ -243,7 +271,15 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
         i.putExtra("bundle",args);
         i.putExtra("title",album.getName());
         //i.putExtra("rowItems", album.getRowItems());
-        startActivity(i);
+        if(Build.VERSION.SDK_INT>20){
+//            getWindow().setSharedElementEnterTransition(TransitionInflater.from(this).inflateTransition(R.transition.shared_element_transition));
+//            view.setTransitionName("videoTrim");
+            Pair<View, String> p1 = Pair.create(sharedImageView, ViewCompat.getTransitionName(sharedImageView));
+            ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(this,p1);
+            startActivity(i,activityOptionsCompat.toBundle());
+        }else {
+            startActivity(i);
+        }
 
     }
 }

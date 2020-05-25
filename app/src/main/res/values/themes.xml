@@ -18,11 +18,23 @@
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
     <style name="Theme.MyApp" parent="Base.Theme.MyApp"/>
     <!--Base custom theme which will be shared between both light and dark theme variants-->
+
     <style name="Base.Theme.MyApp" parent="Base.Theme.MaterialThemeBuilder">
         <!--Material color attributes (light theme) -->
         <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
         <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
         <!--selection controls.-->
+        <!-- enable window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/shared_element_transition</item>
+        <!-- specify enter and exit transitions -->
+<!--        <item name="android:windowEnterTransition">@anim/bottom_sheet_slide_in</item>-->
+<!--        <item name="android:windowExitTransition">@anim/bottom_sheet_slide_out</item>-->
+
+<!--        &lt;!&ndash; specify shared element transitions &ndash;&gt;-->
+        <item name="android:windowSharedElementExitTransition">
+            @transition/shared_element_transition</item>
+
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_600</item>
         <item name="colorPrimaryDark">@color/purple_700</item>

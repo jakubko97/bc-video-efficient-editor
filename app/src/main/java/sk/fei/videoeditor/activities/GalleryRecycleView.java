@@ -5,11 +5,14 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -18,11 +21,18 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.transition.Explode;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -68,6 +78,7 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setAnimation();
         setContentView(R.layout.recycle_list_view);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -82,6 +93,18 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
             requestPermission();
         }
 
+    }
+
+    //Your Slide animation
+    public void setAnimation(){
+        if(Build.VERSION.SDK_INT>20) {
+            Slide slide = new Slide();
+            slide.setSlideEdge(Gravity.RIGHT);
+            slide.setDuration(700);
+            slide.setInterpolator(new AnticipateOvershootInterpolator());
+            getWindow().setExitTransition(slide);
+            getWindow().setEnterTransition(slide);
+        }
     }
 
     @Override
@@ -146,8 +169,13 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if (item.getItemId() == R.id.about) {
-            About.CreateDialog(this);
+        switch(item.getItemId()){
+            case R.id.about :
+                About.CreateDialog(this);
+            case android.R.id.home :
+                supportFinishAfterTransition();
+                break;
+            default: break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -186,7 +214,7 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
     }
 
     @Override
-    public void onRowItemSelected(RowItem rowItem) {
+    public void onRowItemSelected(RowItem rowItem, ImageView sharedImageView) {
 
         selectedItem = rowItem;
 
@@ -197,7 +225,12 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
         if(isVideoValid(rowItem.getFile().getAbsoluteFile().toString())) {
             Intent i = new Intent(GalleryRecycleView.this, TrimVideo.class);
             i.putExtra("uri", rowItem.getFile().getAbsolutePath());
-            startActivity(i);
+            if(Build.VERSION.SDK_INT>20){
+                ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(this,sharedImageView, ViewCompat.getTransitionName(sharedImageView));
+                startActivity(i,activityOptionsCompat.toBundle());
+            }else {
+                startActivity(i);
+            }
         }
     }
 
@@ -218,7 +251,7 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
     }
 
     @Override
-    public void onRefreshData() {
+    public void onRefreshData(boolean multiselect) {
         String songsFound = getResources().getQuantityString(R.plurals.numberOfFiles,adapter.getItemCount(),adapter.getItemCount());
         numberOfFiles.setText(songsFound);
     }

@@ -1,20 +1,28 @@
 package sk.fei.videoeditor.activities;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.view.ViewCompat;
 
 import android.os.Environment;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import com.crystal.crystalrangeseekbar.interfaces.OnRangeSeekbarChangeListener;
@@ -99,7 +107,6 @@ public class TrimVideo extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trim);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initLayoutControls();
 
@@ -111,7 +118,9 @@ public class TrimVideo extends AppCompatActivity {
         }
     }
 
+
     private void initLayoutControls() {
+        playerView = findViewById(R.id.exoplayer);
         textViewLeft = findViewById(R.id.tvvLeft);
         textViewRight = findViewById(R.id.tvvRight);
         textViewCenter = findViewById(R.id.tvDuration);
@@ -194,11 +203,16 @@ public class TrimVideo extends AppCompatActivity {
 
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         switch (item.getItemId()){
             case android.R.id.home:
-                finish();
+                supportFinishAfterTransition();
                 break;
             case R.id.trim :
                 item.setEnabled(false);
@@ -218,7 +232,13 @@ public class TrimVideo extends AppCompatActivity {
                 myintent.putExtra("videoUri", uri.toString());
                 myintent.putExtra("mode", "trimmedVideo");
                 myintent.putExtra("destination", mVideoFileName);
-                startActivity(myintent);
+                if(Build.VERSION.SDK_INT>23){
+                    //ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(this,playerView, playerView.getTransitionName());
+                    ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeBasic();
+                    startActivity(myintent,activityOptionsCompat.toBundle());
+                }else {
+                    startActivity(myintent);
+                }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -372,7 +392,7 @@ public class TrimVideo extends AppCompatActivity {
             audioPlayer = initMediaPlayer();
             setGap(audioPlayer, player);
         }
-        playerView = findViewById(R.id.exoplayer);
+
         playerView.findViewById(R.id.exo_close).setVisibility(View.GONE);
         playerView.findViewById(R.id.exo_share).setVisibility(View.GONE);
         playerView.findViewById(R.id.exo_delete).setVisibility(View.GONE);

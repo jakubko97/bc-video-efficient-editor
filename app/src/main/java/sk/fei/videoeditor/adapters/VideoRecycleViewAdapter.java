@@ -45,7 +45,6 @@ import sk.fei.videoeditor.beans.RowItem;
 public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleViewAdapter.ViewHolder> implements Filterable {
 
     Context context;
-    ImageView imageView;
     private List<RowItem> items;
     private List<RowItem> itemsFiltered;
     private RowItemsListener listener;
@@ -106,7 +105,7 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 itemsFiltered = (ArrayList<RowItem>) filterResults.values;
                 notifyDataSetChanged();
-                listener.onRefreshData();
+                listener.onRefreshData(multiSelect);
             }
         };
     }
@@ -123,29 +122,13 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            if(itemLayoutId == R.layout.gallery_view){
-
-                txtTitle = itemView.findViewById(R.id.mediaTitle);
-                imageView = itemView.findViewById(R.id.mediaIcon);
-                linearLayout = itemView.findViewById(R.id.row_item_root);
-
-            } else if(itemLayoutId == R.layout.audio){
-
             txtTitle = itemView.findViewById(R.id.mediaTitle);
             //txtDesc = itemView.findViewById(R.id.mediaDescription);
             imageView = itemView.findViewById(R.id.mediaIcon);
             txtDateCreated = itemView.findViewById(R.id.mediaDateCreated);
             linearLayout = itemView.findViewById(R.id.row_item_root);
             size = itemView.findViewById(R.id.mediaSize);
-            }
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    listener.onRowItemSelected(itemsFiltered.get(getAdapterPosition()));
-                }
-            });
         }
 
         // Method in ViewHolder class
@@ -190,6 +173,7 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
                 String songsFound = res.getQuantityString(R.plurals.numberOfSelectedFile, getSelectedItemsSize(),getSelectedItemsSize());
                 actionMode.setTitle(songsFound);
             }
+            listener.onRefreshData(multiSelect);
         }
 
         void update(final RowItem rowItem) {
@@ -212,17 +196,16 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
                 }
             });
             itemView.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.Q)
                 @Override
                 public void onClick(View view) {
                     selectItem(rowItem);
                     if(!multiSelect){
-                        listener.onRowItemSelected(itemsFiltered.get(getAdapterPosition()));
+                        listener.onRowItemSelected(rowItem,imageView);
                     }
                 }
             });
 
-            listener.onRefreshData();
+            listener.onRefreshData(multiSelect);
         }
 
     }
@@ -289,11 +272,7 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
         holder.bind(rowItem);
         holder.update(rowItem);
 
-        Log.d("rowItem", "title = " +rowItem.getTitle());
-        Log.d("rowItem", "item count  = " + getItemCount());
 
-//        String songsFound = context.getResources().getQuantityString(R.plurals.numberOfSongsAvailable, getItemCount(),getItemCount());
-//        ((AppCompatActivity)holder.itemView.getContext()).getSupportActionBar().setSubtitle(songsFound);
     }
 
     @Override
@@ -302,8 +281,8 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
     }
 
     public interface RowItemsListener {
-        void onRowItemSelected(RowItem rowItem);
-        void onRefreshData();
+        void onRowItemSelected(RowItem rowItem, ImageView imageView);
+        void onRefreshData(boolean multiselect);
     }
 
 

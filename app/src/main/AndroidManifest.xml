@@ -16,8 +16,7 @@
         android:protectionLevel="normal" />
 
     <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
+        android:name="android.hardware.camera" />
     <uses-feature
         android:name="android.hardware.camera.autofocus"
         android:required="false" />
@@ -34,18 +33,20 @@
         android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/app_icon_round"
+        android:requestLegacyExternalStorage="true"
+        android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApp">
         <activity
             android:name=".activities.GalleryRecycleView"
             android:label="@string/gallery_recycle_view"
             android:screenOrientation="fullSensor"
-            android:parentActivityName=".activities.FolderRecycleView"/>
+          />
         <activity
             android:name=".activities.FolderRecycleView"
             android:label="@string/folder_view"
             android:screenOrientation="fullSensor"
-            android:parentActivityName=".activities.MediaFileRecycleView"/>
+            />
         <activity
             android:name=".activities.VideoViewer"
             android:configChanges="orientation|keyboardHidden|screenSize"

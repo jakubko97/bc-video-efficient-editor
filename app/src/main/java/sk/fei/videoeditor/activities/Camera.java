@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
@@ -52,11 +53,13 @@ import com.otaliastudios.cameraview.controls.Facing;
 import com.otaliastudios.cameraview.controls.Flash;
 import com.otaliastudios.cameraview.controls.Mode;
 import com.otaliastudios.cameraview.controls.VideoCodec;
+import com.otaliastudios.cameraview.size.Size;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import sk.fei.videoeditor.R;
 
@@ -88,6 +91,7 @@ public class Camera extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.overridePendingTransition(R.anim.fade_in_custom, R.anim.fade_out_custom);
         setContentView(R.layout.activity_camera);
 
         Intent i = getIntent();
@@ -98,6 +102,35 @@ public class Camera extends AppCompatActivity {
         setCameraView();
     }
 
+    private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
+        final double ASPECT_TOLERANCE = 0.2;
+        double targetRatio = (double) w / h;
+        if (sizes == null) return null;
+        Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
+        int targetHeight = h;
+        // Try to find an size match aspect ratio and size
+        for (Size size : sizes) {
+            double ratio = (double) size.getWidth() / size.getHeight();
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(size.getHeight() - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.getHeight() - targetHeight);
+            }
+        }
+        // Cannot find the one match the aspect ratio, ignore the requirement
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Size size : sizes) {
+                if (Math.abs(size.getHeight() - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.getHeight() - targetHeight);
+                }
+            }
+        }
+        return optimalSize;
+    }
+
     public void setCameraView(){
         camera = findViewById(R.id.camera);
         camera.setLifecycleOwner(this);
@@ -105,6 +138,11 @@ public class Camera extends AppCompatActivity {
         camera.setAudio(Audio.OFF);
         camera.setVideoCodec(VideoCodec.H_264);
         camera.setFlash(Flash.OFF);
+
+//        Camera.Parameters parameters = mCamera.getParameters();
+//        List<Size> mSupportedPreviewSizes = parameters.getSupportedPreviewSizes();
+//        Size mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
+
 
         closeCam = findViewById(R.id.close_cam);
         selectAudioFab = findViewById(R.id.selectAudio);
@@ -125,12 +163,7 @@ public class Camera extends AppCompatActivity {
             public void onVideoTaken(@NonNull VideoResult result) {
                 super.onVideoTaken(result);
                 Log.w("daAD","onVideoTaken called! Launching activity.");
-                VideoPreview.setVideoResult(result);
-                Intent intent = new Intent(Camera.this, VideoPreview.class);
-                intent.putExtra("mode",mode);
-                intent.putExtra("audioUri",audioUri.toString());
-                startActivity(intent);
-                Log.w("asf","onVideoTaken called! Launched activity.");
+                sendIntent(result);
             }
 
             @Override
@@ -217,6 +250,22 @@ public class Camera extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void sendIntent(VideoResult result){
+        VideoPreview.setVideoResult(result);
+        Log.d("cameraSize", result.getSize().toString());
+
+        Intent intent = new Intent(Camera.this, VideoPreview.class);
+        intent.putExtra("mode",mode);
+        intent.putExtra("audioUri",audioUri.toString());
+        if(Build.VERSION.SDK_INT>20){
+            ActivityOptions options =
+                    ActivityOptions.makeSceneTransitionAnimation(this);
+            startActivity(intent,options.toBundle());
+        }else {
+            startActivity(intent);
+        }
     }
 
     private void animateTextView(){

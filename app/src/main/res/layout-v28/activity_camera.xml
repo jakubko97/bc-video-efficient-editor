@@ -27,8 +27,6 @@
         app:cameraPreview="glSurface"
         app:cameraUseDeviceOrientation="true"
         app:cameraVideoCodec="deviceDefault"
-        app:cameraVideoSizeMaxHeight="1200"
-        app:cameraVideoSizeMaxWidth="800"
         app:cameraWhiteBalance="auto" />
 
     <ImageView
@@ -105,24 +103,6 @@
             app:backgroundTintMode="src_over"
             android:focusable="true" />
 
-
-<!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:id="@+id/videoOnlineImageButton"-->
-<!--            android:src="@drawable/ic_fiber_manual_record_red_48dp"-->
-<!--            android:alpha="0.9"-->
-<!--            android:outlineSpotShadowColor="@color/material_red_900"-->
-<!--            android:layout_margin="16dp"-->
-<!--            android:layout_gravity="center_vertical"-->
-<!--            app:rippleColor="@color/white"-->
-<!--            app:fabCustomSize="80dp"-->
-<!--            app:fabSize="normal"-->
-<!--            app:maxImageSize="80dp"-->
-<!--            android:background="@null"-->
-<!--            android:backgroundTint="@null"-->
-<!--            app:backgroundTint="@null"-->
-<!--             />-->
 
         <ImageButton
             android:layout_width="140dp"

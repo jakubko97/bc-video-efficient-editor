@@ -120,30 +120,21 @@ public class FolderRecycleViewAdapter extends RecyclerView.Adapter<FolderRecycle
             imageView = itemView.findViewById(R.id.mediaIcon);
             linearLayout = itemView.findViewById(R.id.parent);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    listener.onRowItemSelected(albums.get(getAdapterPosition()));
-
-                    Log.d("click",albums.get(getAdapterPosition()) + "click");
-                }
-            });
+//            itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    // send selected contact in callback
+//                    listener.onRowItemSelected(albums.get(getAdapterPosition()), imageView);
+//
+//                    Log.d("click",albums.get(getAdapterPosition()) + "click");
+//                }
+//            });
         }
 
         // Method in ViewHolder class
         void bind(final Album album) {
             // Get the state
-            // Set the visibility based on state
-//                SimpleDateFormat timeStampFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-//                String dateStr = timeStampFormat.format(rowItem.getDateCreated());
-//
-//                dateStr = dateStr.replace("-", ".");
-//
-//                txtDateCreated.setText(dateStr);
-
             txtTitle.setText(album.getName());
-
             String songsFound = context.getResources().getQuantityString(R.plurals.numberOfFiles, album.getRowItems().size(),album.getRowItems().size());
 
             mediaCount.setText(songsFound);
@@ -162,7 +153,7 @@ public class FolderRecycleViewAdapter extends RecyclerView.Adapter<FolderRecycle
             linearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.onRowItemSelected(albums.get(getAdapterPosition()));
+                    listener.onRowItemSelected(album, imageView);
 
                     Log.d("click",albums.get(getAdapterPosition()) + "click2");
                 }
@@ -201,7 +192,7 @@ public class FolderRecycleViewAdapter extends RecyclerView.Adapter<FolderRecycle
     }
 
     public interface RowItemsListener {
-        void onRowItemSelected(Album album);
+        void onRowItemSelected(Album album, ImageView imageView);
     }
 
 }

@@ -134,6 +134,7 @@ public class FetchFiles {
         File[] files = root.listFiles();
 
         assert files != null;
+        if(files.length != 0){
         for (File file : files) {
             if (file.isDirectory()) {
                 //Log.d("dir", "."+ file.getName());
@@ -145,9 +146,10 @@ public class FetchFiles {
                 }
             }
         }
-
+        }
         return arrayList;
     }
+
 
 
     @SuppressLint("DefaultLocale")

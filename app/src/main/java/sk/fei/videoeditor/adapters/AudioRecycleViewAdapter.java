@@ -286,10 +286,10 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
 
     if(rowItem.isExpanded()){
         Animations.expand(layoutExpand);
-    Animations.toggleArrow(addAudio, true);
+    Animations.fadeView(addAudio, true);
     }else{
     Animations.collapse(layoutExpand);
-    Animations.toggleArrow(addAudio, false);
+    Animations.fadeView(addAudio, false);
     }
 
             listener.onRefreshData();
@@ -395,7 +395,7 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private boolean toggleLayout(boolean isExpanded, ExtendedFloatingActionButton b, LinearLayout layoutExpand) {
-        Animations.toggleArrow(b, isExpanded);
+        Animations.fadeView(b, isExpanded);
         if (isExpanded) {
             Animations.expand(layoutExpand);
         } else {

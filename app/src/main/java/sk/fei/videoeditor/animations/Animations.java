@@ -2,12 +2,18 @@ package sk.fei.videoeditor.animations;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.opengl.Visibility;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
+import android.widget.LinearLayout;
 
 import androidx.annotation.RequiresApi;
 
@@ -18,7 +24,7 @@ public class Animations {
         v.setAlpha(0f);
         v.setTranslationY(v.getHeight());
         v.animate()
-                .setDuration(200)
+                .setDuration(400)
                 .translationY(0)
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
@@ -34,7 +40,7 @@ public class Animations {
         v.setAlpha(1f);
         v.setTranslationY(0);
         v.animate()
-                .setDuration(200)
+                .setDuration(400)
                 .translationY(v.getHeight())
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
@@ -67,6 +73,7 @@ public class Animations {
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public static boolean toggleArrow(View view, boolean isExpanded) {
 
+        view.animate().setDuration(400);
         if (isExpanded) {
             //view.animate().setDuration(200).rotation(180);
             view.setVisibility(View.VISIBLE);
@@ -78,38 +85,51 @@ public class Animations {
         }
     }
 
-    public static void expand(View view) {
-        Animation animation = expandAction(view);
-        view.startAnimation(animation);
+
+    public static void expand(final View v) {
+        int prevHeight  = v.getHeight();
+
+        v.setVisibility(View.VISIBLE);
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, 125);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                v.getLayoutParams().height = (int) animation.getAnimatedValue();
+                v.requestLayout();
+            }
+        });
+        valueAnimator.setInterpolator(new DecelerateInterpolator());
+        valueAnimator.setDuration(500);
+        valueAnimator.start();
     }
 
-    private static Animation expandAction(final View view) {
-
-        view.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        final int actualheight = view.getMeasuredHeight();
-
-        view.getLayoutParams().height = 0;
-        view.setVisibility(View.VISIBLE);
-
-        Animation animation = new Animation() {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-
-                view.getLayoutParams().height = interpolatedTime == 1
-                        ? ViewGroup.LayoutParams.WRAP_CONTENT
-                        : (int) (actualheight * interpolatedTime);
-                view.requestLayout();
-            }
-        };
+    public static boolean fadeView(final View view, boolean isExpanded){
 
 
-        animation.setDuration((long) (actualheight / view.getContext().getResources().getDisplayMetrics().density));
+        if (isExpanded) {
+            Animation fadeIn = new AlphaAnimation(0, 1);
+            fadeIn.setInterpolator(new DecelerateInterpolator()); //add this
+            fadeIn.setDuration(1000);
 
-        view.startAnimation(animation);
+            AnimationSet animation = new AnimationSet(false); //change to false
+            animation.addAnimation(fadeIn);
 
-        return animation;
+            view.setAnimation(animation);
+            view.setVisibility(View.VISIBLE);
+            return true;
+        } else {
+//            Animation fadeOut = new AlphaAnimation(1, 0);
+//            fadeOut.setInterpolator(new AccelerateInterpolator()); //and this
+//            //fadeOut.setStartOffset(1000);
+//            fadeOut.setDuration(450);
+//
+//            AnimationSet animation = new AnimationSet(false); //change to false
+//            animation.addAnimation(fadeOut);
+//            view.setAnimation(animation);
+            view.setVisibility(View.GONE);
 
-
+            return false;
+        }
     }
 
     public static void collapse(final View view) {
@@ -130,7 +150,7 @@ public class Animations {
             }
         };
 
-        animation.setDuration((long) (actualHeight/ view.getContext().getResources().getDisplayMetrics().density));
+        animation.setDuration(400);
         view.startAnimation(animation);
     }
 

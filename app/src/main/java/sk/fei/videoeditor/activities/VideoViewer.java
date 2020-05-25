@@ -3,6 +3,7 @@ package sk.fei.videoeditor.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
@@ -73,7 +74,6 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();
-
         setContentView(R.layout.activity_video_view);
         onNewIntent(getIntent());
 
@@ -169,6 +169,7 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
     }
 
     private void closeAllActivities(){
+
         Intent intent = new Intent(getApplicationContext(), MediaFileRecycleView.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
@@ -195,6 +196,7 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
             @Override
             public void onClick(View v) {
                 shareVideo();
+                player.setPlayWhenReady(false);
             }
         });
 
@@ -203,6 +205,7 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
             @Override
             public void onClick(View v) {
                 deleteVideo();
+                player.setPlayWhenReady(false);
             }
         });
 

@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -72,6 +74,7 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.overridePendingTransition(R.anim.bottom_sheet_slide_in, R.anim.bottom_sheet_slide_out);
         setContentView(R.layout.recycle_list_view);
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -169,6 +172,9 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
         if (item.getItemId() == R.id.about) {
             About.CreateDialog(this);
         }
+        if (item.getItemId() == android.R.id.home) {
+            supportFinishAfterTransition();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -218,8 +224,7 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
         Intent intent = new Intent();
         intent.putExtra("audioUri",rowItem.getFile().getAbsolutePath());
         setResult(REQUEST_AUDIO, intent);
-        finish();
-
+        supportFinishAfterTransition();
     }
 
     @Override

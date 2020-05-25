@@ -23,6 +23,7 @@
     <ImageView
         android:id="@+id/mediaIcon"
         android:layout_width="match_parent"
+        android:transitionName="videoTrim"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
          />

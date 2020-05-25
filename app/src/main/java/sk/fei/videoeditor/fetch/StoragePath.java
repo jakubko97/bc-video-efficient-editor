@@ -34,23 +34,26 @@ public class StoragePath {
     public String[] getDeviceStorages() {
         List<String> results = new ArrayList<>();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) { //Method 1 for KitKat & above
-            File[] externalDirs = getExternalFilesDirs;
+        //Method 1 for KitKat & above //get external storages
+        File[] externalDirs = getExternalFilesDirs;
 
-            for (File file : externalDirs) {
-                String path = file.getPath().split("/Android")[0];
+        Log.d("sdcard", externalDirs[0].getAbsolutePath());
+        //Log.d("sdcard", externalDirs[1].getAbsolutePath());
 
-                boolean addPath = false;
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    addPath = Environment.isExternalStorageRemovable(file);
-                } else {
-                    addPath = Environment.MEDIA_MOUNTED.equals(EnvironmentCompat.getStorageState(file));
-                }
+        for (File file : externalDirs) {
+            String path = file.getPath().split("/Android")[0];
 
-                if (addPath) {
-                    results.add(path);
-                }
+            boolean addPath = false;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                addPath = Environment.isExternalStorageRemovable(file);
+            } else {
+                addPath = Environment.MEDIA_MOUNTED.equals(EnvironmentCompat.getStorageState(file));
+            }
+
+            if (addPath) {
+                results.add(path);
             }
         }
 
