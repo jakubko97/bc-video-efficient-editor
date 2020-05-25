@@ -119,12 +119,11 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
         mFullScreenDialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
             public void onBackPressed() {
                     mFullScreenDialog.dismiss();
-                    finish();
+                    closeAllActivities();
             }
         };
 
     }
-
 
     private void openFullscreenDialog() {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
@@ -169,6 +168,12 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
         startActivity(shareIntent);
     }
 
+    private void closeAllActivities(){
+        Intent intent = new Intent(getApplicationContext(), MediaFileRecycleView.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
     private void initExoControlers(){
         playerView =  findViewById(R.id.exoplayer);
         playerView.findViewById(R.id.exo_save).setVisibility(View.GONE);
@@ -181,7 +186,7 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
             @Override
             public void onClick(View v) {
                 mFullScreenDialog.dismiss();
-                finish();
+                closeAllActivities();
             }
         });
 

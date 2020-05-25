@@ -100,6 +100,7 @@ public class TrimVideo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trim);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initLayoutControls();
 
         Intent i = getIntent();

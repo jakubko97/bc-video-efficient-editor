@@ -78,8 +78,8 @@ public class Camera extends AppCompatActivity {
     private String mVideoFileName;
     private Uri audioUri;
     private ExtendedFloatingActionButton selectAudioFab;
-    private FloatingActionButton closeCam, flipCam, flash;
-    private ImageView mRecordImageButton;
+    private FloatingActionButton flipCam, flash;
+    private ImageView mRecordImageButton, closeCam;
 
     private boolean isAudioReady = false;
     @Override

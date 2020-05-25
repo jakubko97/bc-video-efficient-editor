@@ -31,28 +31,19 @@
         app:cameraVideoSizeMaxWidth="800"
         app:cameraWhiteBalance="auto" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageView
         android:id="@+id/close_cam"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_close_white_24dp"
-        app:fabSize="auto"
-        android:alpha="0.65"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="7dp"
-        app:fabCustomSize="40dp"
-        app:iconTint="@color/primaryTextColor"
-        app:backgroundTint="@color/material_gray_300"
-        app:maxImageSize="40dp"
-        app:iconSize="40dp"
-        android:clickable="true"
-        app:elevation="8dp"
-        app:rippleColor="@color/white"
-        app:backgroundTintMode="src_over"
-        android:tint="@color/primaryTextColor"
-        android:focusable="true" />
-
+        style="@style/ExoMediaButton"
+        android:layout_gravity="start"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:maxWidth="45dp"
+        android:maxHeight="45dp"
+        android:elevation="9dp"
+        android:alpha="0.6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_close_clear_cancel"/>
     <Chronometer
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -79,7 +70,7 @@
         app:iconTint="@color/primaryTextColor"
         android:textColor="@color/primaryTextColor"
         app:backgroundTint="@color/material_gray_600"
-        app:rippleColor="@color/primary_accent"
+        app:rippleColor="@color/primary_accent_variant"
         android:elevation="8dp"
         android:text="@string/select_audio" />
 

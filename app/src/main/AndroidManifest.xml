@@ -90,7 +90,6 @@
             android:name=".activities.TrimVideo"
             android:icon="@mipmap/ic_pause"
             android:label="@string/title_activity_trim"
-            android:parentActivityName=".activities.GalleryRecycleView"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:screenOrientation="portrait"
             />
