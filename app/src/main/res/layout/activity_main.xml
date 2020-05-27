@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/gradient2"
-    tools:context="sk.fei.videoeditor.activities.MainActivity">
+  >
 
     <LinearLayout
         android:layout_width="match_parent"

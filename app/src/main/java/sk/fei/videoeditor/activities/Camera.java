@@ -10,6 +10,7 @@ import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.camera2.CaptureRequest;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -137,12 +138,11 @@ public class Camera extends AppCompatActivity {
         camera.setMode(Mode.VIDEO);
         camera.setAudio(Audio.OFF);
         camera.setVideoCodec(VideoCodec.H_264);
-        camera.setFlash(Flash.OFF);
+        camera.setFlash(Flash.TORCH);
 
 //        Camera.Parameters parameters = mCamera.getParameters();
 //        List<Size> mSupportedPreviewSizes = parameters.getSupportedPreviewSizes();
 //        Size mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
-
 
         closeCam = findViewById(R.id.close_cam);
         selectAudioFab = findViewById(R.id.selectAudio);
@@ -157,6 +157,7 @@ public class Camera extends AppCompatActivity {
                 finish();
             }
         });
+
 
         camera.addCameraListener(new CameraListener() {
             @Override
@@ -196,13 +197,14 @@ public class Camera extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
-                    if (camera.getFlash() == Flash.ON) {
+                    if (camera.getFlash().equals(Flash.ON)) {
                         camera.setFlash(Flash.OFF);
+                        Log.d("flash", camera.getFlash().toString());
                         flash.setBackgroundResource(R.drawable.flash_off_foreground);
                     } else {
                         camera.setFlash(Flash.ON);
+                        Log.d("flash", camera.getFlash().toString());
                         flash.setBackgroundResource(R.drawable.flash_foreground);
-
                     }
                 } else {
                     Toast.makeText(Camera.this, "Your device doesn't have a flash camera..", Toast.LENGTH_SHORT).show();
@@ -312,10 +314,17 @@ public class Camera extends AppCompatActivity {
         }
     }
 
+    private boolean checkPermission(){
+        int result = ContextCompat.checkSelfPermission(Camera.this, Manifest.permission.CAMERA);
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        if(checkPermission()){
         camera.open();
+        }
     }
 
     @Override

@@ -226,7 +226,7 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
                 }
                 else if(mode.equals("earlyStop")){
                     pts = getVideoDuration()/(float)getAudioDuration();
-                    command = new String[]{"-i", videoResult.getFile().getPath(),"-i", audioUri.getPath(), "-filter:v", "setpts=PTS/"+pts+"","-acodec", "copy", dest.getAbsolutePath()};
+                    command = new String[]{"-i", videoResult.getFile().getPath(),"-i", audioUri.getPath(), "-filter:v", "setpts=PTS/"+pts+"[v]","-acodec", "copy", dest.getAbsolutePath()};
                 }
             }
         }
@@ -521,7 +521,6 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
             e.printStackTrace();
         }
         audioPlayer.start();
-
     }
 
     @Override

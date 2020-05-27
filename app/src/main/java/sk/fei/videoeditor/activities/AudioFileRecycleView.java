@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -94,11 +95,12 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
         super.onStart();
     }
 
+    @SuppressLint("SetTextI18n")
     private void initViews(){
         numberOfSongs = findViewById(R.id.numberOfFiles);
         noItems = findViewById(R.id.noItems);
         noItemsText = findViewById(R.id.noItemsText);
-        noItemsText.setText("NO AUDIO");
+        noItemsText.setText("No audio founded");
         recyclerView = findViewById(R.id.recycleList);
         linearLayout = findViewById(R.id.media_root_layout);
     }
@@ -144,7 +146,7 @@ public class AudioFileRecycleView extends AppCompatActivity implements SearchVie
                 noItems.setVisibility(View.VISIBLE);
                 noItemsText.setVisibility(View.VISIBLE);
                 Snackbar snackbar = Snackbar
-                        .make(linearLayout, "You have to upload some songs before processing.",Snackbar.LENGTH_INDEFINITE)
+                        .make(linearLayout, "You have to upload song (.mp3) to your phone's storage before the process.",Snackbar.LENGTH_INDEFINITE)
                         .setAction("OK", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {

@@ -63,7 +63,7 @@ public class FFmpegWorker extends Worker {
             loadFFmpegBinary();
         } catch (FFmpegNotSupportedException e) {
             e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "Mp3 conversion is not supported by that device", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Video conversion is not supported by that device", Toast.LENGTH_LONG).show();
 
             return Result.failure();
         }
@@ -78,13 +78,13 @@ public class FFmpegWorker extends Worker {
             @Override
             public void onFailure(String message) {
                 super.onFailure(message);
-                Log.d("jakubko",message);
+                Log.d("execute","onFailure : " +message);
             }
 
             @Override
             public void onSuccess(String message) {
                 super.onSuccess(message);
-                Log.d("jakubko",message);
+                Log.d("execute","onSuccess :" +message);
             }
 
             @Override
@@ -124,7 +124,7 @@ public class FFmpegWorker extends Worker {
                 super.onStart();
                     createNotification();
 
-                Log.d("jakubko","Cut started");
+                Log.d("execute","onStart executing");
             }
 
             @Override
@@ -151,11 +151,11 @@ public class FFmpegWorker extends Worker {
         });
     }
 
-
     private void loadFFmpegBinary() throws FFmpegNotSupportedException {
         if(ffmpeg == null){
             ffmpeg = FFmpeg.getInstance(getApplicationContext());
         }
+
         //Load the binary
         ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
 

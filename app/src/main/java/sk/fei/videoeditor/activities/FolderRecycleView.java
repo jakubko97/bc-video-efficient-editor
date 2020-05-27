@@ -31,11 +31,14 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.Serializable;
@@ -65,6 +68,7 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
     ImageView noItems;
     Boolean isSDPresent = android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
     Boolean isSDSupportedDevice = Environment.isExternalStorageRemovable();
+    LinearLayout linearLayout;
 
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -105,6 +109,8 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
         recyclerView = findViewById(R.id.recycleList);
         itemLayout = R.layout.folder_item;
         pathTitle = findViewById(R.id.path);
+        linearLayout = findViewById(R.id.media_root_layout);
+
 
     }
 
@@ -161,8 +167,17 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
                 recyclerView.setVisibility(View.GONE);
                 numberOfFolders.setVisibility(View.GONE);
                 noItems.setVisibility(View.VISIBLE);
-                noItemsText.setText("No mp4 file founded");
+                noItemsText.setText("No video founded");
                 noItemsText.setVisibility(View.VISIBLE);
+                Snackbar snackbar = Snackbar
+                        .make(linearLayout, "You have to upload video (.mp4) to your phone's storage before the process.",Snackbar.LENGTH_INDEFINITE)
+                        .setAction("OK", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                finish();
+                            }
+                        });
+                snackbar.show();
             }
 
     }
