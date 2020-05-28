@@ -52,9 +52,11 @@ import sk.fei.videoeditor.dialogs.About;
 import sk.fei.videoeditor.fetch.FetchFiles;
 import sk.fei.videoeditor.fetch.StoragePath;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static android.widget.GridLayout.HORIZONTAL;
 
-public class FolderRecycleView extends AppCompatActivity implements SearchView.OnQueryTextListener, FolderRecycleViewAdapter.RowItemsListener, Serializable {
+public class FolderRecycleView extends AppCompatActivity implements FolderRecycleViewAdapter.RowItemsListener, Serializable {
 
     private static final int PERMISSION_REQUEST_CODE = 100;
     RecyclerView recyclerView;
@@ -185,13 +187,18 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
     @Override
     public void onBackPressed() {
         // close search view on back button pressed
-        if (!searchView.isIconified()) {
-            searchView.setIconified(true);
-            return;
-        }
+//        if (!searchView.isIconified()) {
+//            searchView.setIconified(true);
+//            return;
+//        }
         super.onBackPressed();
     }
 
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
+    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -211,34 +218,37 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.search_menu, menu);
 
-        SearchManager searchManager = (SearchManager)
-                getSystemService(Context.SEARCH_SERVICE);
-        searchMenuItem = menu.findItem(R.id.search);
-        searchView = (SearchView) searchMenuItem.getActionView();
-
-        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setOnQueryTextListener(this);
+        menu.findItem(R.id.search).setVisible(false);
+//        SearchManager searchManager = (SearchManager)
+//                getSystemService(Context.SEARCH_SERVICE);
+//        searchMenuItem = menu.findItem(R.id.search);
+//        searchView = (SearchView) searchMenuItem.getActionView();
+//
+//        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+//        //searchView.setOnQueryTextListener(this);
 
         return super.onCreateOptionsMenu(menu);
     }
 
-
-
     @Override
-    public boolean onQueryTextSubmit(String query) {
-        adapter.getFilter().filter(query);
-        return false;
+    public void onRefreshData() {
+        String songsFound = getResources().getQuantityString(R.plurals.numberOfFolders,adapter.getItemCount(),adapter.getItemCount());
+        numberOfFolders.setText(songsFound);
     }
 
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        adapter.getFilter().filter(newText);
-
-        return true;
-    }
-
-
+//    @Override
+//    public boolean onQueryTextSubmit(String query) {
+//        adapter.getFilter().filter(query);
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean onQueryTextChange(String newText) {
+//        adapter.getFilter().filter(newText);
+//
+//        return true;
+//    }
 
 
     @Override
@@ -279,6 +289,11 @@ public class FolderRecycleView extends AppCompatActivity implements SearchView.O
 
     @Override
     public void onRowItemSelected(Album album, ImageView sharedImageView) {
+
+//        if (searchView.isShown()) {
+//            searchMenuItem.collapseActionView();
+//            searchView.setQuery("", false);
+//        }
 
         Intent i = new Intent(FolderRecycleView.this, GalleryRecycleView.class);
         Bundle args = new Bundle();

@@ -463,7 +463,7 @@ public class TrimVideo extends AppCompatActivity {
         if (requestCode == REQUEST_AUDIO_TRIM && resultCode == REQUEST_AUDIO) {
             audioUri = Uri.parse(intent.getStringExtra("audioUri"));
 
-            //Toast.makeText(Camera.this,"Select audio before recording." + intent.getStringExtra("audioUri"),Toast.LENGTH_LONG).show();
+            //Toast.makeText(CameraActivity.this,"Select audio before recording." + intent.getStringExtra("audioUri"),Toast.LENGTH_LONG).show();
         }
     }
 

@@ -42,66 +42,65 @@ import sk.fei.videoeditor.R;
 import sk.fei.videoeditor.beans.Album;
 import sk.fei.videoeditor.beans.RowItem;
 
-public class FolderRecycleViewAdapter extends RecyclerView.Adapter<FolderRecycleViewAdapter.ViewHolder> implements Filterable {
+public class FolderRecycleViewAdapter extends RecyclerView.Adapter<FolderRecycleViewAdapter.ViewHolder> {
 
-    Context context;
-    ImageView imageView;
-    private List<RowItem> items;
+    private Context context;
     private List<Album> albums;
-    private List<RowItem> itemsFiltered;
+    private List<Album> itemsFiltered;
     private RowItemsListener listener;
-    int itemLayoutId;
-
-    private ArrayList<RowItem> selectedItems = new ArrayList<>();
+    private int itemLayoutId;
 
     @Override
     public int getItemCount() {
-        return albums.size();
+        return itemsFiltered.size();
     }
+
+
 
     public FolderRecycleViewAdapter (Context context, int itemLayoutId,
                                      List<Album> albums, RowItemsListener listener) {
         this.context = context;
         this.albums = albums;
-        this.itemsFiltered = items;
+        this.itemsFiltered = albums;
         this.listener = listener;
         this.itemLayoutId = itemLayoutId;
     }
 
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-                String charString = charSequence.toString();
-                if (charString.isEmpty()) {
-                    itemsFiltered = items;
-                } else {
-                    List<RowItem> filteredList = new ArrayList<>();
-                    for (RowItem row : items) {
-
-                        // name match condition. this might differ depending on your requirement
-                        // here we are looking for name or phone number match
-                        if (row.getTitle().toLowerCase().contains(charString.toLowerCase()) || row.getTitle().contains(charSequence)) {
-                            filteredList.add(row);
-                        }
-                    }
-
-                    itemsFiltered = filteredList;
-                }
-
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = itemsFiltered;
-                return filterResults;
-            }
-
-            @Override
-            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                itemsFiltered = (ArrayList<RowItem>) filterResults.values;
-                notifyDataSetChanged();
-            }
-        };
-    }
+//    @Override
+//    public Filter getFilter() {
+//        return new Filter() {
+//            @Override
+//            protected FilterResults performFiltering(CharSequence charSequence) {
+//                String charString = charSequence.toString();
+//                if (charString.isEmpty()) {
+//                    itemsFiltered = albums;
+//                } else {
+//                    List<Album> filteredList = new ArrayList<>();
+//                    for (Album album : albums) {
+//
+//                        // name match condition. this might differ depending on your requirement
+//                        // here we are looking for name or phone number match
+//                        if (album.getName().toLowerCase().contains(charString.toLowerCase()) || album.getName().contains(charSequence)) {
+//                            filteredList.add(album);
+//                        }
+//                    }
+//
+//                    itemsFiltered = filteredList;
+//                }
+//
+//                FilterResults filterResults = new FilterResults();
+//                filterResults.values = itemsFiltered;
+//                return filterResults;
+//            }
+//
+//            @Override
+//            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+//                itemsFiltered = (ArrayList<Album>) filterResults.values;
+//                notifyDataSetChanged();
+//                listener.onRefreshData();
+//            }
+//        };
+//    }
 
 
 
@@ -193,6 +192,7 @@ public class FolderRecycleViewAdapter extends RecyclerView.Adapter<FolderRecycle
 
     public interface RowItemsListener {
         void onRowItemSelected(Album album, ImageView imageView);
+        void onRefreshData();
     }
 
 }

@@ -222,6 +222,7 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
             searchMenuItem.collapseActionView();
             searchView.setQuery("", false);
         }
+
         if(isVideoValid(rowItem.getFile().getAbsoluteFile().toString())) {
             Intent i = new Intent(GalleryRecycleView.this, TrimVideo.class);
             i.putExtra("uri", rowItem.getFile().getAbsolutePath());

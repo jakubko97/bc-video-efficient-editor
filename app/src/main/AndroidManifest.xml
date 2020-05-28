@@ -11,23 +11,18 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.hardware.camera2.flash"/>
     <!-- Allows access to the flashlight -->
-    <permission android:name="android.permission.FLASHLIGHT"
+    <uses-permission android:name="android.permission.FLASHLIGHT"
         android:permissionGroup="android.permission-group.HARDWARE_CONTROLS"
         android:protectionLevel="normal"
          />
 
-    <uses-feature
-        android:name="android.hardware.camera" />
-    <uses-feature
-        android:name="android.hardware.camera.autofocus"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.camera.front"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.microphone"
-        android:required="false" />
+    <uses-feature android:name="android.hardware.camera2" android:required="false" />
+    <uses-feature android:name="android.hardware.camera2.flash" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -61,7 +56,7 @@
         <activity
             android:name=".activities.AudioFileRecycleView"
             android:label="@string/my_music"
-            android:parentActivityName=".activities.Camera"
+            android:parentActivityName=".activities.CameraActivity"
             android:resource="@xml/searchable"
             android:screenOrientation="fullSensor"
             />
@@ -78,7 +73,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.Camera"
+            android:name=".activities.CameraActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
             />
