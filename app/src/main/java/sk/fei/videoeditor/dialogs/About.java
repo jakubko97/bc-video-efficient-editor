@@ -21,18 +21,6 @@ public class About {
                 " Source code is available on <url>https://github.com/jakubko97/myVideoEditor/</url>"));
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 //        builder.setMessage("If you want to create some videos click on the button placed on the bottom right corner.");
 //        builder.setMessage("You can select video from your mobile's storage or record a new video.");
 //        builder.setMessage("The whole process requires audio file for both options.");

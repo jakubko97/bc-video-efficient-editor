@@ -1,10 +1,7 @@
 package sk.fei.videoeditor.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import android.app.Dialog;
@@ -14,13 +11,9 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -35,8 +28,6 @@ import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ui.PlayerControlView;
-import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -170,7 +161,7 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
 
     private void closeAllActivities(){
 
-        Intent intent = new Intent(getApplicationContext(), MediaFileRecycleView.class);
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
@@ -239,7 +230,7 @@ public class VideoViewer extends AppCompatActivity implements AdsMediaSource.Med
                         Toast.makeText(VideoViewer.this,"Video has been deleted succesfully.",Toast.LENGTH_LONG).show();
 
                         dialog.dismiss();
-                        Intent intent = new Intent(getApplicationContext(), MediaFileRecycleView.class);
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Removes other Activities from stack
                         startActivity(intent);
                     }else{

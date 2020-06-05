@@ -11,15 +11,15 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.hardware.camera2.flash"/>
+    <uses-permission android:name="android.hardware.camera.flash"/>
     <!-- Allows access to the flashlight -->
     <uses-permission android:name="android.permission.FLASHLIGHT"
         android:permissionGroup="android.permission-group.HARDWARE_CONTROLS"
         android:protectionLevel="normal"
          />
 
-    <uses-feature android:name="android.hardware.camera2" android:required="false" />
-    <uses-feature android:name="android.hardware.camera2.flash" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
@@ -50,7 +50,7 @@
             android:name=".activities.VideoViewer"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="fullSensor"
-            android:parentActivityName=".activities.MediaFileRecycleView"
+            android:parentActivityName=".activities.MainActivity"
             />
 
         <activity
@@ -61,7 +61,7 @@
             android:screenOrientation="fullSensor"
             />
         <activity
-            android:name=".activities.MediaFileRecycleView"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:resource="@xml/searchable"
             android:screenOrientation="fullSensor"

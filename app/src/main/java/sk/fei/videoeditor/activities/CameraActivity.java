@@ -13,6 +13,7 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
@@ -22,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -60,11 +62,15 @@ import com.otaliastudios.cameraview.controls.Facing;
 import com.otaliastudios.cameraview.controls.Flash;
 import com.otaliastudios.cameraview.controls.Mode;
 import com.otaliastudios.cameraview.controls.VideoCodec;
+import com.otaliastudios.cameraview.size.Size;
+import com.otaliastudios.cameraview.size.SizeSelector;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import sk.fei.videoeditor.R;
@@ -117,6 +123,7 @@ public class CameraActivity extends AppCompatActivity {
         for(final String cameraId : cManager.getCameraIdList()){
             CameraCharacteristics characteristics = cManager.getCameraCharacteristics(cameraId);
             int cOrientation = characteristics.get(CameraCharacteristics.LENS_FACING);
+
             if(cOrientation == CameraCharacteristics.LENS_FACING_BACK)
             {
                 Log.d("facing back", cameraId);
@@ -131,6 +138,7 @@ public class CameraActivity extends AppCompatActivity {
 
         if (getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
             CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+
             String cameraId = null; // Usually front camera is at 0 position.
             try {
                 cameraId = getBackFacingCameraId(Objects.requireNonNull(camManager));
@@ -166,6 +174,50 @@ public class CameraActivity extends AppCompatActivity {
 
     }
 
+    public static Size getOptimalPreviewSize(
+            List<Size> sizes, int w, int h) {
+        // Use a very small tolerance because we want an exact match.
+        final double ASPECT_TOLERANCE = 0.1;
+        double targetRatio = (double) w / h;
+        if (sizes == null)
+            return null;
+
+        Size optimalSize = null;/*  w  w  w  .ja va  2 s .c  om*/
+
+        // Start with max value and refine as we iterate over available preview sizes. This is the
+        // minimum difference between view and camera height.
+        double minDiff = Double.MAX_VALUE;
+
+        // Target view height
+        int targetHeight = h;
+
+        // Try to find a preview size that matches aspect ratio and the target view size.
+        // Iterate over all available sizes and pick the largest size that can fit in the view and
+        // still maintain the aspect ratio.
+        for (Size size : sizes) {
+            double ratio = (double) size.getWidth() / size.getHeight();
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE)
+                continue;
+            if (Math.abs(size.getHeight() - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.getHeight() - targetHeight);
+            }
+        }
+
+        // Cannot find preview size that matches the aspect ratio, ignore the requirement
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Size size : sizes) {
+                if (Math.abs(size.getHeight() - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.getHeight() - targetHeight);
+                }
+            }
+        }
+
+        return optimalSize;
+    }
+
     public void setCameraView(){
         camera = findViewById(R.id.camera);
         camera.setLifecycleOwner(this);
@@ -174,6 +226,35 @@ public class CameraActivity extends AppCompatActivity {
         camera.setFacing(Facing.BACK);
         camera.setVideoCodec(VideoCodec.H_264);
         camera.setFlash(Flash.OFF);
+
+        // This will be the size of videos taken with takeVideo().
+        camera.setVideoSize(new SizeSelector() {
+            @Override
+            public List<Size> select(List<Size> source) {
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+                int height = displayMetrics.heightPixels;
+                int width = displayMetrics.widthPixels;
+
+                List<Size> optimalSizes = new ArrayList<>();
+//                optimalSizes.add(getOptimalPreviewSize(source, width, height));
+                Log.d("size", "velkost: " + width + ", " + height);
+                Log.d("size", "velkost: " +getOptimalPreviewSize(source, width, height).toString());
+                for(Size s : source){
+                    Log.d("size", "velkost: "+ s.toString());
+                    String[] separated = s.toString().split("x");
+                    double w = Double.parseDouble(separated[0]);
+                    double h = Double.parseDouble(separated[1]);
+                    double ratio = h/w;
+                    if(ratio >= 1.75 && ratio <= 1.85){
+                        optimalSizes.add(s);
+
+                    }
+                }
+                return optimalSizes;
+            }
+        });
 
 //        closeCam = findViewById(R.id.close_cam);
         selectAudioText = findViewById(R.id.selectAudioText);

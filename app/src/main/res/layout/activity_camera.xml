@@ -28,8 +28,7 @@
         app:cameraPreview="glSurface"
         app:cameraUseDeviceOrientation="true"
         app:cameraVideoCodec="deviceDefault"
-        app:cameraVideoSizeMaxHeight="1920"
-        app:cameraVideoSizeMaxWidth="1080"
+
         app:cameraWhiteBalance="auto" />
 
     <RelativeLayout

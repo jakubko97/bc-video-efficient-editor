@@ -13,18 +13,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.transition.Slide;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -37,7 +32,6 @@ import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
-import androidx.work.Worker;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -60,17 +54,13 @@ import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.DefaultTimeBar;
-import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.otaliastudios.cameraview.VideoResult;
 
 import java.io.File;
@@ -171,7 +161,7 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
     }
 
     private void clearAllActivities(){
-        Intent intent = new Intent(getApplicationContext(), MediaFileRecycleView.class);
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
@@ -185,8 +175,10 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
         OneTimeWorkRequest mRequest = new OneTimeWorkRequest.Builder(FFmpegWorker.class)
                 .setInputData(createInputData(command,duration,dest.getPath()))
                 .build();
+
         WorkManager mWorkManager = WorkManager.getInstance();
         mWorkManager.beginWith(mRequest).enqueue();
+
         mWorkManager.getWorkInfoByIdLiveData(mRequest.getId()).observe(this, workInfo -> {
             if (workInfo != null) {
                 if(workInfo.getState() == WorkInfo.State.SUCCEEDED){
@@ -195,7 +187,6 @@ public class VideoPreview extends AppCompatActivity implements AdsMediaSource.Me
                 Log.d("videoPreview", "work state = " + workInfo.getState());
             }
         });
-
         return isSaved;
     }
 

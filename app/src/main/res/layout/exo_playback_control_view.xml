@@ -16,14 +16,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#CC000000"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingTop="4dp"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
     <ImageButton
         android:id="@+id/exo_close"
         style="@style/ExoMediaButton"
         android:layout_gravity="start"
         android:elevation="8dp"
         android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         app:srcCompat="@android:drawable/ic_menu_close_clear_cancel"/>
 
     <ImageButton
@@ -32,31 +43,30 @@
         android:layout_gravity="start"
         android:elevation="8dp"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/stat_sys_download_done"/>
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        app:srcCompat="@drawable/ic_file_download_white_24dp"/>
 
     <ImageButton
         android:id="@+id/exo_delete"
         style="@style/ExoMediaButton"
         android:layout_gravity="start"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
         android:elevation="8dp"
         android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_delete"/>
 
     <ImageButton
         android:id="@+id/exo_share"
         style="@style/ExoMediaButton"
         android:layout_gravity="start"
+        android:layout_toStartOf="@id/exo_delete"
         android:visibility="visible"
-        app:layout_constraintRight_toLeftOf="@+id/exo_delete"
         android:elevation="8dp"
-        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_share"/>
 
-
+    </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

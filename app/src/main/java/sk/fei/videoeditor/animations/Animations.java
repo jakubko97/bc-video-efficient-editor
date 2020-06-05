@@ -70,7 +70,6 @@ public class Animations {
         return rotate;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     public static boolean toggleArrow(View view, boolean isExpanded) {
 
         view.animate().setDuration(400);

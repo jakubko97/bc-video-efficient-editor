@@ -63,8 +63,6 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
     RecyclerView recyclerView;
     RowItem selectedItem;
     private MenuItem searchMenuItem;
-    String fileType = ".mp4";
-    File root = Environment.getExternalStorageDirectory();
     SearchView searchView;
     VideoRecycleViewAdapter adapter;
     int itemLayout;
@@ -74,7 +72,6 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
     LinearLayout linearLayout;
 
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,7 +133,6 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
     private void fetchFiles(){
 
             if(!rowItems.isEmpty()){
-
 
                 pathTitle.setText("~ "+ rowItems.get(0).getParent().getAbsolutePath());
                 adapter = new VideoRecycleViewAdapter(this, itemLayout,rowItems,this,false);
@@ -226,12 +222,9 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
         if(isVideoValid(rowItem.getFile().getAbsoluteFile().toString())) {
             Intent i = new Intent(GalleryRecycleView.this, TrimVideo.class);
             i.putExtra("uri", rowItem.getFile().getAbsolutePath());
-            if(Build.VERSION.SDK_INT>20){
                 ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(this,sharedImageView, ViewCompat.getTransitionName(sharedImageView));
                 startActivity(i,activityOptionsCompat.toBundle());
-            }else {
-                startActivity(i);
-            }
+
         }
     }
 
@@ -245,7 +238,7 @@ public class GalleryRecycleView extends AppCompatActivity implements SearchView.
             Snackbar snackbar = Snackbar
                     .make(linearLayout, "The video is not supported.", Snackbar.LENGTH_LONG);
             snackbar.show();
-            //Toast.makeText(MediaFileRecycleView.this, "Video can not be played", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, "Video can not be played", Toast.LENGTH_SHORT).show();
             return false;
         }
 

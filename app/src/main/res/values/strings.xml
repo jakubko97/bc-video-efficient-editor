@@ -62,6 +62,7 @@
     <string name="Audio">audio</string>
     <string name="folder_view">Folder recycle view</string>
     <string name="my_gallery">My Gallery</string>
+    <string name="storno">Storno</string>
 
     <plurals name="numberOfSongsAvailable">
         <!--
@@ -85,6 +86,19 @@
           -->
         <item quantity="one">%d file</item>
         <item quantity="other">%d files</item>
+    </plurals>
+
+
+    <plurals name="deleteSelectedItems">
+        <!--
+             As a developer, you should always supply "one" and "other"
+             strings. Your translators will know which strings are actually
+             needed for their language. Always include %d in "one" because
+             translators will need to use %d for languages where "one"
+             doesn't mean 1 (as explained above).
+          -->
+        <item quantity="one">Delete video</item>
+        <item quantity="other">Delete videos</item>
     </plurals>
 
     <plurals name="numberOfFolders">

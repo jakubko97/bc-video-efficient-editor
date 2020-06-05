@@ -1,46 +1,40 @@
 package sk.fei.videoeditor.adapters;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import android.app.Activity;
+
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.inputmethodservice.Keyboard;
-import android.media.Image;
-import android.net.Uri;
-import android.os.Build;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 
 import sk.fei.videoeditor.R;
-import sk.fei.videoeditor.activities.MediaFileRecycleView;
+import sk.fei.videoeditor.activities.MainActivity;
 import sk.fei.videoeditor.beans.RowItem;
+import sk.fei.videoeditor.dialogs.About;
+import sk.fei.videoeditor.dialogs.ActionDelete;
 
 public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleViewAdapter.ViewHolder> implements Filterable {
 
@@ -226,11 +220,9 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            for (RowItem rowItem : selectedItems) {
-                itemsFiltered.remove(rowItem);
-                rowItem.getFile().delete();
+            if(selectedItems.size() != 0){
+            ActionDelete.CreateDialog(context, selectedItems, itemsFiltered, mode);
             }
-            mode.finish();
             return true;
         }
 
@@ -239,11 +231,8 @@ public class VideoRecycleViewAdapter extends RecyclerView.Adapter<VideoRecycleVi
             multiSelect = false;
             selectedItems.clear();
             notifyDataSetChanged();
-
         }
     };
-
-
 
     @NonNull
     @Override

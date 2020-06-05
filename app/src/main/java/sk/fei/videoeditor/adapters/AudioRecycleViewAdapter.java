@@ -237,7 +237,6 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
 //            }
 //        }
 
-        @RequiresApi(api = Build.VERSION_CODES.Q)
         void update(final RowItem rowItem) {
             linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -246,7 +245,6 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
                 }
             });
             linearLayout.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.Q)
                 @Override
                 public void onClick(View view) {
                         Log.d("rowItem", rowItem.getFile().getAbsolutePath()  + " title" + rowItem.getTitle());
@@ -255,13 +253,16 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
                     layoutExpand.getTag().equals(rowItem);
 
 
-                    boolean show = toggleLayout(!rowItem.isExpanded(), addAudio, layoutExpand);
-                        rowItem.setExpanded(show);
+                    boolean show = false;
+                        show = toggleLayout(!rowItem.isExpanded(), addAudio, layoutExpand);
+
+                    rowItem.setExpanded(show);
 
                         if(lastExpandedItem != null){
                             if(!lastExpandedItem.equals(rowItem)){
                                 lastExpandedItem.setExpanded(false);
-                                toggleLayout(lastExpandedItem.isExpanded(), lastAddAudio, lastExpandedLayout);
+                                    toggleLayout(lastExpandedItem.isExpanded(), lastAddAudio, lastExpandedLayout);
+
                                 //Animations.collapse(lastExpandedLayout);
                             clearMediaPlayer();
                             initAudioPlayer(rowItem);
@@ -353,7 +354,6 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
         return viewHolder;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Get the data model based on position
@@ -361,9 +361,6 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
 
         holder.bind(rowItem);
         holder.update(rowItem);
-
-
-
 
     }
 
@@ -383,7 +380,6 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     public void onRestartMediaPLayer(){
         if(mediaPlayer != null){
            if(lastExpandedItem.isExpanded()){
@@ -393,7 +389,6 @@ public class AudioRecycleViewAdapter extends RecyclerView.Adapter<AudioRecycleVi
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     private boolean toggleLayout(boolean isExpanded, ExtendedFloatingActionButton b, LinearLayout layoutExpand) {
         Animations.fadeView(b, isExpanded);
         if (isExpanded) {
