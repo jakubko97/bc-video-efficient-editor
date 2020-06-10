@@ -110,7 +110,6 @@ public class CameraActivity extends AppCompatActivity {
         this.overridePendingTransition(R.anim.fade_in_custom, R.anim.fade_out_custom);
         setContentView(R.layout.activity_camera);
 
-
         Intent i = getIntent();
         if (i != null) {
                 //audioUri = Uri.parse(i.getStringExtra("audioUri"));
